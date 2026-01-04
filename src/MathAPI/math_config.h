@@ -8,8 +8,3 @@
 //#else
 //#define MATH_API __declspec(dllimport)
 //#endif
-
-#ifndef MATH_ASSERT
-#include <cassert>
-#define MATH_ASSERT(x) assert(x)
-#endif

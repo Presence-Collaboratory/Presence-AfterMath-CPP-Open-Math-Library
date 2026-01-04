@@ -1,6 +1,6 @@
 // Description: 4x4 matrix class with comprehensive mathematical operations,
-//              SSE optimization, and Column-Major layout for OpenGL/Vulkan compatibility.
-// Author: NSDeathMan, DeepSeek
+//              SSE optimization, and Row-Major layout for DirectX compatibility.
+// Author: NSDeathman, DeepSeek
 #pragma once
 
 #include <cmath>
@@ -23,24 +23,24 @@ namespace Math
 
     /**
      * @class float4x4
-     * @brief 4x4 matrix class stored in Column-Major order.
+     * @brief 4x4 matrix class stored in Row-Major order.
      *
-     * Represents a 4x4 matrix stored in column-major order for OpenGL/Vulkan compatibility.
+     * Represents a 4x4 matrix stored in row-major order for DirectX compatibility.
      * Provides comprehensive linear algebra operations including matrix multiplication,
      * inversion, determinant calculation, and various 3D transformation matrices.
      *
-     * @note Column-major storage for compatibility with OpenGL, Vulkan and GLSL
+     * @note Row-major storage for compatibility with DirectX and HLSL
      * @note Full SSE optimization for performance-critical operations
      * @note Perfect for 3D transformations, view/projection matrices, and linear algebra
      */
     class MATH_API float4x4
     {
     public:
-        // Store matrix as four float4 columns for alignment and SSE optimization
-        alignas(16) float4 col0_;  ///< First column (x axis / right vector)
-        alignas(16) float4 col1_;  ///< Second column (y axis / up vector)
-        alignas(16) float4 col2_;  ///< Third column (z axis / forward vector)
-        alignas(16) float4 col3_;  ///< Fourth column (translation / perspective)
+        // Store matrix as four float4 rows for alignment and SSE optimization
+        alignas(16) float4 row0_;  ///< First row (x axis / right vector)
+        alignas(16) float4 row1_;  ///< Second row (y axis / up vector)
+        alignas(16) float4 row2_;  ///< Third row (z axis / forward vector)
+        alignas(16) float4 row3_;  ///< Fourth row (translation / perspective)
 
     public:
         // ============================================================================
@@ -53,43 +53,43 @@ namespace Math
         float4x4() noexcept;
 
         /**
-         * @brief Construct from column vectors
-         * @param c0 First column vector
-         * @param c1 Second column vector
-         * @param c2 Third column vector
-         * @param c3 Fourth column vector (translation/perspective)
+         * @brief Construct from row vectors
+         * @param r0 First row vector
+         * @param r1 Second row vector
+         * @param r2 Third row vector
+         * @param r3 Fourth row vector (translation/perspective)
          */
-        float4x4(const float4& c0, const float4& c1, const float4& c2, const float4& c3) noexcept;
+        float4x4(const float4& r0, const float4& r1, const float4& r2, const float4& r3) noexcept;
 
         /**
-         * @brief Construct from 16 scalar values (column-major order)
-         * @param m00 Element at column 0, row 0
-         * @param m10 Element at column 0, row 1
-         * @param m20 Element at column 0, row 2
-         * @param m30 Element at column 0, row 3
-         * @param m01 Element at column 1, row 0
-         * @param m11 Element at column 1, row 1
-         * @param m21 Element at column 1, row 2
-         * @param m31 Element at column 1, row 3
-         * @param m02 Element at column 2, row 0
-         * @param m12 Element at column 2, row 1
-         * @param m22 Element at column 2, row 2
-         * @param m32 Element at column 2, row 3
-         * @param m03 Element at column 3, row 0
-         * @param m13 Element at column 3, row 1
-         * @param m23 Element at column 3, row 2
-         * @param m33 Element at column 3, row 3
-         * @note Parameters are in column-major order and stored internally in column-major
+         * @brief Construct from 16 scalar values (row-major order)
+         * @param m00 Element at row 0, column 0
+         * @param m01 Element at row 0, column 1
+         * @param m02 Element at row 0, column 2
+         * @param m03 Element at row 0, column 3
+         * @param m10 Element at row 1, column 0
+         * @param m11 Element at row 1, column 1
+         * @param m12 Element at row 1, column 2
+         * @param m13 Element at row 1, column 3
+         * @param m20 Element at row 2, column 0
+         * @param m21 Element at row 2, column 1
+         * @param m22 Element at row 2, column 2
+         * @param m23 Element at row 2, column 3
+         * @param m30 Element at row 3, column 0
+         * @param m31 Element at row 3, column 1
+         * @param m32 Element at row 3, column 2
+         * @param m33 Element at row 3, column 3
+         * @note Parameters are in row-major order and stored internally in row-major
          */
-        float4x4(float m00, float m10, float m20, float m30,
-            float m01, float m11, float m21, float m31,
-            float m02, float m12, float m22, float m32,
-            float m03, float m13, float m23, float m33) noexcept;
+        float4x4(float m00, float m01, float m02, float m03,
+            float m10, float m11, float m12, float m13,
+            float m20, float m21, float m22, float m23,
+            float m30, float m31, float m32, float m33) noexcept;
 
         /**
-         * @brief Construct from column-major array
-         * @param data Column-major array of 16 elements
-         * @note Expected order: [col0.x, col0.y, col0.z, col0.w, col1.x, ...]
+         * @brief Construct from row-major array
+         * @param data Row-major array of 16 elements
+         * @note Expected order: [row0.x, row0.y, row0.z, row0.w, row1.x, ...]
          */
         explicit float4x4(const float* data) noexcept;
 
@@ -120,6 +120,15 @@ namespace Math
          */
         explicit float4x4(const quaternion& q) noexcept;
 
+#if defined(MATH_SUPPORT_D3DX)
+        /**
+         * @brief Construct from D3DXMATRIX
+         * @param mat DirectX matrix
+         * @note Converts from DirectX to internal row-major storage
+         */
+        float4x4(const D3DXMATRIX& mat) noexcept;
+#endif
+
         // ============================================================================
         // Static Constructors
         // ============================================================================
@@ -136,7 +145,7 @@ namespace Math
          */
         static float4x4 zero() noexcept;
 
-        // --- Transformations (Column-Major specific) ---
+        // --- Transformations (Row-Major specific) ---
 
         /**
          * @brief Translation matrix from components
@@ -218,12 +227,12 @@ namespace Math
         static float4x4 rotation_euler(const float3& angles) noexcept;
 
         /**
-         * @brief TRS matrix (Scale * Rotation * Translation) for column-major
+         * @brief TRS matrix (Translation * Rotation * Scale)
          * @param translation Translation vector
          * @param rotation Rotation quaternion
          * @param scale Scale vector
          * @return TRS transformation matrix
-         * @note For column-major: M = T * R * S (applied in reverse order)
+         * @note Composite transformation matrix for 3D objects
          */
         static float4x4 TRS(const float3& translation, const quaternion& rotation, const float3& scale) noexcept;
 
@@ -236,6 +245,7 @@ namespace Math
          * @param zNear Near clipping plane
          * @param zFar Far clipping plane
          * @return Perspective projection matrix (LH, ZO)
+         * @note DirectX default projection
          */
         static float4x4 perspective_lh_zo(float fovY, float aspect, float zNear, float zFar) noexcept;
 
@@ -272,13 +282,13 @@ namespace Math
         static float4x4 perspective_rh_no(float fovY, float aspect, float zNear, float zFar) noexcept;
 
         /**
-         * @brief Default Perspective projection (RH, ZO)
+         * @brief Default Perspective projection (LH, ZO)
          * @param fovY Vertical field of view in radians
          * @param aspect Aspect ratio (width/height)
          * @param zNear Near clipping plane
          * @param zFar Far clipping plane
          * @return Perspective projection matrix
-         * @note Default to OpenGL/Vulkan style (RH, ZO)
+         * @note Default to DirectX style (LH, ZO)
          */
         static float4x4 perspective(float fovY, float aspect, float zNear, float zFar) noexcept;
 
@@ -311,6 +321,7 @@ namespace Math
          * @param zNear Near clipping plane
          * @param zFar Far clipping plane
          * @return Orthographic projection matrix
+         * @note Default to DirectX style (LH, ZO)
          */
         static float4x4 orthographic(float width, float height, float zNear, float zFar) noexcept;
 
@@ -322,6 +333,7 @@ namespace Math
          * @param target Target position
          * @param up Up vector
          * @return View matrix (LH)
+         * @note DirectX default view matrix
          */
         static float4x4 look_at_lh(const float3& eye, const float3& target, const float3& up) noexcept;
 
@@ -331,17 +343,17 @@ namespace Math
          * @param target Target position
          * @param up Up vector
          * @return View matrix (RH)
-         * @note OpenGL/Vulkan default view matrix
+         * @note OpenGL default view matrix
          */
         static float4x4 look_at_rh(const float3& eye, const float3& target, const float3& up) noexcept;
 
         /**
-         * @brief Default Look-At view matrix (RH)
+         * @brief Default Look-At view matrix (LH)
          * @param eye Camera position
          * @param target Target position
          * @param up Up vector
          * @return View matrix
-         * @note Default to OpenGL/Vulkan style (RH)
+         * @note Default to DirectX style (LH)
          */
         static float4x4 look_at(const float3& eye, const float3& target, const float3& up) noexcept;
 
@@ -350,26 +362,26 @@ namespace Math
         // ============================================================================
 
         /**
-         * @brief Access column by index
-         * @param colIndex Column index (0, 1, 2, or 3)
-         * @return Reference to column
-         * @note Column-major storage: [column][row]
+         * @brief Access row by index
+         * @param rowIndex Row index (0, 1, 2, or 3)
+         * @return Reference to row
+         * @note Row-major storage: [row][column]
          */
-        float4& operator[](int colIndex) noexcept;
+        float4& operator[](int rowIndex) noexcept;
 
         /**
-         * @brief Access column by index (const)
-         * @param colIndex Column index (0, 1, 2, or 3)
-         * @return Const reference to column
+         * @brief Access row by index (const)
+         * @param rowIndex Row index (0, 1, 2, or 3)
+         * @return Const reference to row
          */
-        const float4& operator[](int colIndex) const noexcept;
+        const float4& operator[](int rowIndex) const noexcept;
 
         /**
-         * @brief Access element by row and column (column-major)
+         * @brief Access element by row and column (row-major)
          * @param row Row index (0, 1, 2, or 3)
          * @param col Column index (0, 1, 2, or 3)
          * @return Reference to element
-         * @note Column-major: element at [row][column] = column[col][row]
+         * @note Row-major: [row][column]
          */
         float& operator()(int row, int col) noexcept;
 
@@ -382,81 +394,81 @@ namespace Math
         const float& operator()(int row, int col) const noexcept;
 
         // ============================================================================
-        // Column and Row Accessors
+        // Row and Column Accessors
         // ============================================================================
-
-        /**
-         * @brief Get column 0
-         * @return First column
-         */
-        float4 col0() const noexcept { return col0_; }
-
-        /**
-         * @brief Get column 1
-         * @return Second column
-         */
-        float4 col1() const noexcept { return col1_; }
-
-        /**
-         * @brief Get column 2
-         * @return Third column
-         */
-        float4 col2() const noexcept { return col2_; }
-
-        /**
-         * @brief Get column 3
-         * @return Fourth column (translation/perspective)
-         */
-        float4 col3() const noexcept { return col3_; }
-
-        /**
-         * @brief Set column 0
-         * @param c New column values
-         */
-        void set_col0(const float4& c) { col0_ = c; }
-
-        /**
-         * @brief Set column 1
-         * @param c New column values
-         */
-        void set_col1(const float4& c) { col1_ = c; }
-
-        /**
-         * @brief Set column 2
-         * @param c New column values
-         */
-        void set_col2(const float4& c) { col2_ = c; }
-
-        /**
-         * @brief Set column 3
-         * @param c New column values
-         */
-        void set_col3(const float4& c) { col3_ = c; }
 
         /**
          * @brief Get row 0
          * @return First row
-         * @note Expensive in column-major storage
          */
-        float4 row0() const noexcept;
+        float4 row0() const noexcept { return row0_; }
 
         /**
          * @brief Get row 1
          * @return Second row
          */
-        float4 row1() const noexcept;
+        float4 row1() const noexcept { return row1_; }
 
         /**
          * @brief Get row 2
          * @return Third row
          */
-        float4 row2() const noexcept;
+        float4 row2() const noexcept { return row2_; }
 
         /**
          * @brief Get row 3
-         * @return Fourth row
+         * @return Fourth row (translation/perspective)
          */
-        float4 row3() const noexcept;
+        float4 row3() const noexcept { return row3_; }
+
+        /**
+         * @brief Set row 0
+         * @param r New row values
+         */
+        void set_row0(const float4& r) { row0_ = r; }
+
+        /**
+         * @brief Set row 1
+         * @param r New row values
+         */
+        void set_row1(const float4& r) { row1_ = r; }
+
+        /**
+         * @brief Set row 2
+         * @param r New row values
+         */
+        void set_row2(const float4& r) { row2_ = r; }
+
+        /**
+         * @brief Set row 3
+         * @param r New row values
+         */
+        void set_row3(const float4& r) { row3_ = r; }
+
+        /**
+         * @brief Get column 0
+         * @return First column
+         * @note Expensive in row-major storage
+         */
+        float4 col0() const noexcept;
+
+        /**
+         * @brief Get column 1
+         * @return Second column
+         */
+        float4 col1() const noexcept;
+
+        /**
+         * @brief Get column 2
+         * @return Third column
+         */
+        float4 col2() const noexcept;
+
+        /**
+         * @brief Get column 3
+         * @return Fourth column (translation/perspective)
+         */
+        float4 col3() const noexcept;
 
         // ============================================================================
         // Compound Assignment Operators (SSE Optimized)
@@ -539,7 +551,7 @@ namespace Math
         /**
          * @brief Compute inverse matrix for affine transformations
          * @return Inverse matrix
-         * @note Optimized for affine matrices (last column = [0,0,0,1])
+         * @note Optimized for affine matrices (last row = [0,0,0,1])
          */
         float4x4 inverted_affine() const noexcept;
 
@@ -588,10 +600,10 @@ namespace Math
         // ============================================================================
 
         /**
-         * @brief Transform 4D vector (matrix * column vector)
+         * @brief Transform 4D vector (row vector * matrix)
          * @param vec 4D vector to transform
          * @return Transformed 4D vector
-         * @note SSE optimized matrix-vector multiplication for column-major
+         * @note SSE optimized vector-matrix multiplication for row-major
          * @note Handles homogeneous coordinates and perspective division
          */
         float4 transform_vector(const float4& vec) const noexcept;
@@ -627,14 +639,14 @@ namespace Math
         /**
          * @brief Extract translation component
          * @return Translation vector
-         * @note Returns the XYZ components of the fourth column
+         * @note Returns the XYZ components of the fourth row
          */
         float3 get_translation() const noexcept;
 
         /**
          * @brief Extract scale component
          * @return Scale vector
-         * @note Computes length of each axis vector (columns 0-2)
+         * @note Computes length of each axis vector (rows 0-2)
          */
         float3 get_scale() const noexcept;
 
@@ -670,7 +682,7 @@ namespace Math
         bool is_identity(float epsilon = Constants::Constants<float>::Epsilon) const noexcept;
 
         /**
-         * @brief Check if matrix is affine (last column is [0,0,0,1])
+         * @brief Check if matrix is affine (last row is [0,0,0,1])
          * @param epsilon Comparison tolerance
          * @return True if matrix is affine
          * @note Affine matrices preserve parallel lines (no perspective)
@@ -703,21 +715,21 @@ namespace Math
         /**
          * @brief Convert to string representation
          * @return String representation of matrix
-         * @note Format: "[col0] [col1] [col2] [col3]" (column-major)
+         * @note Format: "[row0]\n[row1]\n[row2]\n[row3]"
          */
         std::string to_string() const;
 
         /**
          * @brief Store matrix to column-major array
          * @param data Destination array (must have at least 16 elements)
-         * @note Direct OpenGL/Vulkan compatible output
+         * @note Converts from row-major to column-major for OpenGL
          */
         void to_column_major(float* data) const noexcept;
 
         /**
          * @brief Store matrix to row-major array
          * @param data Destination array (must have at least 16 elements)
-         * @note Converts from column-major to row-major for DirectX
+         * @note DirectX compatible output
          */
         void to_row_major(float* data) const noexcept;
 
@@ -738,6 +750,15 @@ namespace Math
          * @return True if matrices are not approximately equal
          */
         bool operator!=(const float4x4& rhs) const noexcept;
+
+#if defined(MATH_SUPPORT_D3DX)
+        /**
+         * @brief Convert to D3DXMATRIX
+         * @return D3DXMATRIX equivalent
+         * @note Converts to DirectX row-major format
+         */
+        operator D3DXMATRIX() const noexcept;
+#endif
     };
 
     // ============================================================================
@@ -765,7 +786,7 @@ namespace Math
      * @param lhs Left-hand side matrix
      * @param rhs Right-hand side matrix
      * @return Product matrix
-     * @note Full SSE optimized 4x4 matrix multiplication for column-major
+     * @note Full SSE optimized 4x4 matrix multiplication for row-major
      */
     float4x4 operator*(const float4x4& lhs, const float4x4& rhs) noexcept;
 
@@ -794,25 +815,25 @@ namespace Math
     inline float4x4 operator/(const float4x4& mat, float scalar) noexcept { return float4x4(mat) /= scalar; }
 
     /**
-     * @brief Matrix-vector multiplication (matrix * column vector)
-     * @param mat Transformation matrix
+     * @brief Vector-matrix multiplication (row vector * matrix)
      * @param vec Vector to transform
+     * @param mat Transformation matrix
      * @return Transformed vector
-     * @note Column-major order: matrix * vector
+     * @note Row-major order: vector * matrix
      */
-    inline float4 operator*(const float4x4& mat, const float4& vec) noexcept
+    inline float4 operator*(const float4& vec, const float4x4& mat) noexcept
     {
         return mat.transform_vector(vec);
     }
 
     /**
-     * @brief Matrix-point multiplication (matrix * point)
-     * @param mat Transformation matrix
+     * @brief Point-matrix multiplication (point * matrix)
      * @param point Point to transform
+     * @param mat Transformation matrix
      * @return Transformed point
      * @note Applies homogeneous transformation with perspective division
      */
-    inline float3 operator*(const float4x4& mat, const float3& point) noexcept
+    inline float3 operator*(const float3& point, const float4x4& mat) noexcept
     {
         return mat.transform_point(point);
     }
@@ -843,20 +864,20 @@ namespace Math
     inline float determinant(const float4x4& mat) noexcept { return mat.determinant(); }
 
     /**
-     * @brief Matrix-vector multiplication
-     * @param mat Transformation matrix
+     * @brief Vector-matrix multiplication
      * @param vec Vector to transform
+     * @param mat Transformation matrix
      * @return Transformed vector
      */
-    inline float4 mul(const float4x4& mat, const float4& vec) noexcept { return mat * vec; }
+    inline float4 mul(const float4& vec, const float4x4& mat) noexcept { return vec * mat; }
 
     /**
-     * @brief Matrix-point multiplication
-     * @param mat Transformation matrix
+     * @brief Point-matrix multiplication
      * @param point Point to transform
+     * @param mat Transformation matrix
      * @return Transformed point
      */
-    inline float3 mul(const float4x4& mat, const float3& point) noexcept { return mat * point; }
+    inline float3 mul(const float3& point, const float4x4& mat) noexcept { return point * mat; }
 
     /**
      * @brief Matrix multiplication

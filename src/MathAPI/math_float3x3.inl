@@ -1,18 +1,17 @@
 ﻿namespace Math
 {
     // ============================================================================
-    // Constructors Implementation (COLUMN-MAJOR)
+    // Constructors Implementation
     // ============================================================================
 
     inline float3x3::float3x3() noexcept
-        : col0_(1.0f, 0.0f, 0.0f, 0.0f),    // First column: [1, 0, 0]^T
-        col1_(0.0f, 1.0f, 0.0f, 0.0f),    // Second column: [0, 1, 0]^T
-        col2_(0.0f, 0.0f, 1.0f, 0.0f)     // Third column: [0, 0, 1]^T
+        : col0_(1.0f, 0.0f, 0.0f, 0.0f),
+        col1_(0.0f, 1.0f, 0.0f, 0.0f),
+        col2_(0.0f, 0.0f, 1.0f, 0.0f)
     {}
 
     inline float3x3::float3x3(const float3& col0, const float3& col1, const float3& col2) noexcept
     {
-        // Direct column assignment (COLUMN-MAJOR)
         col0_ = float4(col0.x, col0.y, col0.z, 0.0f);
         col1_ = float4(col1.x, col1.y, col1.z, 0.0f);
         col2_ = float4(col2.x, col2.y, col2.z, 0.0f);
@@ -22,39 +21,30 @@
         float m10, float m11, float m12,
         float m20, float m21, float m22) noexcept
     {
-        // Convert ROW-MAJOR parameters to COLUMN-MAJOR storage
-        // Row 0: m00, m01, m02 -> becomes: col0.x, col1.x, col2.x
-        // Row 1: m10, m11, m12 -> becomes: col0.y, col1.y, col2.y
-        // Row 2: m20, m21, m22 -> becomes: col0.z, col1.z, col2.z
-        col0_ = float4(m00, m10, m20, 0.0f);  // First column: [m00, m10, m20]^T
-        col1_ = float4(m01, m11, m21, 0.0f);  // Second column: [m01, m11, m21]^T
-        col2_ = float4(m02, m12, m22, 0.0f);  // Third column: [m02, m12, m22]^T
+        col0_ = float4(m00, m10, m20, 0.0f);
+        col1_ = float4(m01, m11, m21, 0.0f);
+        col2_ = float4(m02, m12, m22, 0.0f);
     }
 
     inline float3x3::float3x3(const float* data) noexcept
     {
-        // Input is ROW-MAJOR: [r0c0, r0c1, r0c2, r1c0, r1c1, r1c2, r2c0, r2c1, r2c2]
-        // Convert to COLUMN-MAJOR storage
-        col0_ = float4(data[0], data[3], data[6], 0.0f);  // First column: [r0c0, r1c0, r2c0]^T
-        col1_ = float4(data[1], data[4], data[7], 0.0f);  // Second column: [r0c1, r1c1, r2c1]^T
-        col2_ = float4(data[2], data[5], data[8], 0.0f);  // Third column: [r0c2, r1c2, r2c2]^T
+        col0_ = float4(data[0], data[1], data[2], 0.0f);
+        col1_ = float4(data[3], data[4], data[5], 0.0f);
+        col2_ = float4(data[6], data[7], data[8], 0.0f);
     }
 
     inline float3x3::float3x3(float scalar) noexcept
-        : col0_(scalar, 0, 0, 0),    // First column: [scalar, 0, 0]^T
-        col1_(0, scalar, 0, 0),    // Second column: [0, scalar, 0]^T
-        col2_(0, 0, scalar, 0)     // Third column: [0, 0, scalar]^T
-    {}
+        : col0_(scalar, 0, 0, 0),
+        col1_(0, scalar, 0, 0),
+        col2_(0, 0, scalar, 0) {}
 
     inline float3x3::float3x3(const float3& diagonal) noexcept
-        : col0_(diagonal.x, 0, 0, 0),    // First column: [diag.x, 0, 0]^T
-        col1_(0, diagonal.y, 0, 0),    // Second column: [0, diag.y, 0]^T
-        col2_(0, 0, diagonal.z, 0)     // Third column: [0, 0, diag.z]^T
-    {}
+        : col0_(diagonal.x, 0, 0, 0),
+        col1_(0, diagonal.y, 0, 0),
+        col2_(0, 0, diagonal.z, 0) {}
 
     inline float3x3::float3x3(const float4x4& mat4x4) noexcept
     {
-        // Extract upper-left 3x3 from 4x4 matrix (both COLUMN-MAJOR)
         const __m128 mask = _mm_set_ps(0.0f, 1.0f, 1.0f, 1.0f);
         col0_ = float4(_mm_and_ps(mat4x4.col0().get_simd(), mask));
         col1_ = float4(_mm_and_ps(mat4x4.col1().get_simd(), mask));
@@ -63,7 +53,6 @@
 
     inline float3x3::float3x3(const quaternion& q) noexcept
     {
-        // Generate rotation matrix from quaternion (COLUMN-MAJOR)
         const float xx = q.x * q.x;
         const float yy = q.y * q.y;
         const float zz = q.z * q.z;
@@ -74,13 +63,8 @@
         const float wy = q.w * q.y;
         const float wz = q.w * q.z;
 
-        // First column: [1 - 2(yy + zz), 2(xy + wz), 2(xz - wy)]^T
         col0_ = float4(1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz), 2.0f * (xz - wy), 0.0f);
-
-        // Second column: [2(xy - wz), 1 - 2(xx + zz), 2(yz + wx)]^T
         col1_ = float4(2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + wx), 0.0f);
-
-        // Third column: [2(xz + wy), 2(yz - wx), 1 - 2(xx + yy)]^T
         col2_ = float4(2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy), 0.0f);
     }
 
@@ -90,7 +74,6 @@
 
     inline float3x3& float3x3::operator=(const float4x4& mat4x4) noexcept
     {
-        // Extract upper-left 3x3 from 4x4 matrix (both COLUMN-MAJOR)
         const __m128 mask = _mm_set_ps(0.0f, 1.0f, 1.0f, 1.0f);
         col0_ = float4(_mm_and_ps(mat4x4.col0().get_simd(), mask));
         col1_ = float4(_mm_and_ps(mat4x4.col1().get_simd(), mask));
@@ -99,12 +82,11 @@
     }
 
     // ============================================================================
-    // Access Operators Implementation (COLUMN-MAJOR)
+    // Access Operators Implementation
     // ============================================================================
 
     inline float3& float3x3::operator[](int colIndex) noexcept
     {
-        // COLUMN-MAJOR: index refers to column number
         switch (colIndex) {
         case 0: return *reinterpret_cast<float3*>(&col0_);
         case 1: return *reinterpret_cast<float3*>(&col1_);
@@ -117,7 +99,6 @@
 
     inline const float3& float3x3::operator[](int colIndex) const noexcept
     {
-        // COLUMN-MAJOR: index refers to column number
         switch (colIndex) {
         case 0: return *reinterpret_cast<const float3*>(&col0_);
         case 1: return *reinterpret_cast<const float3*>(&col1_);
@@ -130,7 +111,6 @@
 
     inline float& float3x3::operator()(int row, int col) noexcept
     {
-        // COLUMN-MAJOR: m[col][row]
         switch (col) {
         case 0:
             switch (row) {
@@ -156,7 +136,6 @@
 
     inline const float& float3x3::operator()(int row, int col) const noexcept
     {
-        // COLUMN-MAJOR: m[col][row]
         switch (col) {
         case 0:
             switch (row) {
@@ -215,27 +194,27 @@
 
     inline void float3x3::set_row0(const float3& row) noexcept
     {
-        col0_.x = row.x;  // Row 0, Column 0
-        col1_.x = row.y;  // Row 0, Column 1
-        col2_.x = row.z;  // Row 0, Column 2
+        col0_.x = row.x;
+        col1_.x = row.y;
+        col2_.x = row.z;
     }
 
     inline void float3x3::set_row1(const float3& row) noexcept
     {
-        col0_.y = row.x;  // Row 1, Column 0
-        col1_.y = row.y;  // Row 1, Column 1
-        col2_.y = row.z;  // Row 1, Column 2
+        col0_.y = row.x;
+        col1_.y = row.y;
+        col2_.y = row.z;
     }
 
     inline void float3x3::set_row2(const float3& row) noexcept
     {
-        col0_.z = row.x;  // Row 2, Column 0
-        col1_.z = row.y;  // Row 2, Column 1
-        col2_.z = row.z;  // Row 2, Column 2
+        col0_.z = row.x;
+        col1_.z = row.y;
+        col2_.z = row.z;
     }
 
     // ============================================================================
-    // Static Constructors Implementation (COLUMN-MAJOR)
+    // Static Constructors Implementation
     // ============================================================================
 
     inline float3x3 float3x3::identity() noexcept
@@ -260,7 +239,7 @@
         return float3x3(float3(scale.x, 0, 0), float3(0, scale.y, 0), float3(0, 0, scale.z));
     }
 
-    inline float3x3 float3x3::scaling(const float scaleX, const float scaleY, const float scaleZ) noexcept
+    inline float3x3 float3x3::scaling(const float& scaleX, const float& scaleY, const float& scaleZ) noexcept
     {
         return float3x3(float3(scaleX, 0, 0), float3(0, scaleY, 0), float3(0, 0, scaleZ));
     }
@@ -275,37 +254,34 @@
         float s, c;
         MathFunctions::sin_cos(angle, &s, &c);
 
-        // COLUMN-MAJOR: each float3 is a column
         return float3x3(
-            float3(1.0f, 0.0f, 0.0f),  // First column
-            float3(0.0f, c, s),        // Second column
-            float3(0.0f, -s, c)        // Third column
+            float3(1.0f, 0.0f, 0.0f),
+            float3(0.0f, c, s),
+            float3(0.0f, -s, c)
         );
     }
 
     inline float3x3 float3x3::rotation_y(float angle) noexcept
     {
-        float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        float cos_a = std::cos(angle);
+        float sin_a = std::sin(angle);
 
-        // COLUMN-MAJOR: each float3 is a column
         return float3x3(
-            float3(c, 0.0f, -s),       // First column
-            float3(0.0f, 1.0f, 0.0f),  // Second column
-            float3(s, 0.0f, c)         // Third column
+            float3(cos_a, 0.0f, -sin_a),
+            float3(0.0f, 1.0f, 0.0f),
+            float3(sin_a, 0.0f, cos_a)
         );
     }
 
     inline float3x3 float3x3::rotation_z(float angle) noexcept
     {
-        float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        float cos_a = std::cos(angle);
+        float sin_a = std::sin(angle);
 
-        // COLUMN-MAJOR: each float3 is a column
         return float3x3(
-            float3(c, s, 0.0f),        // First column
-            float3(-s, c, 0.0f),       // Second column
-            float3(0.0f, 0.0f, 1.0f)   // Third column
+            float3(cos_a, sin_a, 0.0f),
+            float3(-sin_a, cos_a, 0.0f),
+            float3(0.0f, 0.0f, 1.0f)
         );
     }
 
@@ -326,7 +302,6 @@
         const float xy = x * y, xz = x * z, yz = y * z;
         const float xs = x * s, ys = y * s, zs = z * s;
 
-        // COLUMN-MAJOR construction using Rodrigues' rotation formula
         __m128 col0 = _mm_set_ps(0.0f, xz * one_minus_c - ys, xy * one_minus_c + zs, xx * one_minus_c + c);
         __m128 col1 = _mm_set_ps(0.0f, yz * one_minus_c + xs, yy * one_minus_c + c, xy * one_minus_c - zs);
         __m128 col2 = _mm_set_ps(0.0f, zz * one_minus_c + c, yz * one_minus_c - xs, xz * one_minus_c + ys);
@@ -341,28 +316,24 @@
 
     inline float3x3 float3x3::rotation_euler(const float3& angles) noexcept
     {
-        // For COLUMN-MAJOR: M = Mz * My * Mx (applied from right to left)
         return rotation_z(angles.z) * rotation_y(angles.y) * rotation_x(angles.x);
     }
 
     inline float3x3 float3x3::skew_symmetric(const float3& vec) noexcept
     {
-        // COLUMN-MAJOR: each column is cross(vec, basis_vector)
         return float3x3(
-            float3(0, vec.z, -vec.y),      // cross(vec, [1,0,0])
-            float3(-vec.z, 0, vec.x),      // cross(vec, [0,1,0])
-            float3(vec.y, -vec.x, 0)       // cross(vec, [0,0,1])
+            float3(0, vec.z, -vec.y),
+            float3(-vec.z, 0, vec.x),
+            float3(vec.y, -vec.x, 0)
         );
     }
 
     inline float3x3 float3x3::outer_product(const float3& u, const float3& v) noexcept
     {
-        // Outer product u * v^T (COLUMN-MAJOR)
-        // Column i = u * v[i]
         return float3x3(
-            float3(u.x * v.x, u.y * v.x, u.z * v.x),  // First column: u * v.x
-            float3(u.x * v.y, u.y * v.y, u.z * v.y),  // Second column: u * v.y
-            float3(u.x * v.z, u.y * v.z, u.z * v.z)   // Third column: u * v.z
+            float3(u.x * v.x, u.y * v.x, u.z * v.x),
+            float3(u.x * v.y, u.y * v.y, u.z * v.y),
+            float3(u.x * v.z, u.y * v.z, u.z * v.z)
         );
     }
 
@@ -425,16 +396,15 @@
     }
 
     // ============================================================================
-    // Matrix Operations Implementation (COLUMN-MAJOR)
+    // Matrix Operations Implementation
     // ============================================================================
 
     inline float3x3 float3x3::transposed() const noexcept
     {
-        // Transpose by extracting rows and converting them to columns
         return float3x3(
-            row0(),  // First row becomes first column
-            row1(),  // Second row becomes second column
-            row2()   // Third row becomes third column
+            row0(),
+            row1(),
+            row2()
         );
     }
 
@@ -444,7 +414,6 @@
         const float3 col1 = col1_.xyz();
         const float3 col2 = col2_.xyz();
 
-        // Determinant formula for COLUMN-MAJOR: det = col0·(col1×col2)
         const float a = col0.x, b = col0.y, c = col0.z;
         const float d = col1.x, e = col1.y, f = col1.z;
         const float g = col2.x, h = col2.y, i = col2.z;
@@ -458,7 +427,6 @@
         __m128 c1 = _mm_load_ps(&col1_.x);
         __m128 c2 = _mm_load_ps(&col2_.x);
 
-        // Compute determinant using SSE
         __m128 c1_yzx = _mm_shuffle_ps(c1, c1, _MM_SHUFFLE(3, 0, 2, 1));
         __m128 c2_yzx = _mm_shuffle_ps(c2, c2, _MM_SHUFFLE(3, 0, 2, 1));
         __m128 c1_zxy = _mm_shuffle_ps(c1, c1, _MM_SHUFFLE(3, 1, 0, 2));
@@ -485,43 +453,39 @@
         const float d = col1_.x, e = col1_.y, f = col1_.z;
         const float g = col2_.x, h = col2_.y, i = col2_.z;
 
-        // Compute adjugate matrix (transpose of cofactor matrix)
-        // For COLUMN-MAJOR: inverse = (1/det) * adjugate
         __m128 adj00_adj01 = _mm_set_ps(0.0f,
-            b * f - c * e,        // cofactor(0,0)
-            -(b * i - c * h),     // cofactor(0,1)
-            e * i - f * h);       // cofactor(0,2)
+            b * f - c * e,
+            -(b * i - c * h),
+            e * i - f * h);
 
         __m128 adj10_adj11 = _mm_set_ps(0.0f,
-            -(a * f - c * d),     // cofactor(1,0)
-            a * i - c * g,        // cofactor(1,1)
-            -(d * i - f * g));    // cofactor(1,2)
+            -(a * f - c * d),
+            a * i - c * g,
+            -(d * i - f * g));
 
         __m128 adj20_adj21 = _mm_set_ps(0.0f,
-            a * e - b * d,        // cofactor(2,0)
-            -(a * h - b * g),     // cofactor(2,1)
-            d * h - e * g);       // cofactor(2,2)
+            a * e - b * d,
+            -(a * h - b * g),
+            d * h - e * g);
 
-        // Multiply by inverse determinant
         adj00_adj01 = _mm_mul_ps(adj00_adj01, inv_det_vec);
         adj10_adj11 = _mm_mul_ps(adj10_adj11, inv_det_vec);
         adj20_adj21 = _mm_mul_ps(adj20_adj21, inv_det_vec);
 
-        // Construct columns from adjugate rows (transpose)
         __m128 result_col0 = _mm_set_ps(0.0f,
-            _mm_cvtss_f32(_mm_shuffle_ps(adj20_adj21, adj20_adj21, _MM_SHUFFLE(0, 0, 0, 0))),  // cofactor(2,0)
-            _mm_cvtss_f32(_mm_shuffle_ps(adj10_adj11, adj10_adj11, _MM_SHUFFLE(0, 0, 0, 0))),  // cofactor(1,0)
-            _mm_cvtss_f32(adj00_adj01));  // cofactor(0,0)
+            _mm_cvtss_f32(_mm_shuffle_ps(adj20_adj21, adj20_adj21, _MM_SHUFFLE(0, 0, 0, 0))),
+            _mm_cvtss_f32(_mm_shuffle_ps(adj10_adj11, adj10_adj11, _MM_SHUFFLE(0, 0, 0, 0))),
+            _mm_cvtss_f32(adj00_adj01));
 
         __m128 result_col1 = _mm_set_ps(0.0f,
-            _mm_cvtss_f32(_mm_shuffle_ps(adj20_adj21, adj20_adj21, _MM_SHUFFLE(1, 1, 1, 1))),  // cofactor(2,1)
-            _mm_cvtss_f32(_mm_shuffle_ps(adj10_adj11, adj10_adj11, _MM_SHUFFLE(1, 1, 1, 1))),  // cofactor(1,1)
-            _mm_cvtss_f32(_mm_shuffle_ps(adj00_adj01, adj00_adj01, _MM_SHUFFLE(1, 1, 1, 1)))); // cofactor(0,1)
+            _mm_cvtss_f32(_mm_shuffle_ps(adj20_adj21, adj20_adj21, _MM_SHUFFLE(1, 1, 1, 1))),
+            _mm_cvtss_f32(_mm_shuffle_ps(adj10_adj11, adj10_adj11, _MM_SHUFFLE(1, 1, 1, 1))),
+            _mm_cvtss_f32(_mm_shuffle_ps(adj00_adj01, adj00_adj01, _MM_SHUFFLE(1, 1, 1, 1))));
 
         __m128 result_col2 = _mm_set_ps(0.0f,
-            _mm_cvtss_f32(_mm_shuffle_ps(adj20_adj21, adj20_adj21, _MM_SHUFFLE(2, 2, 2, 2))),  // cofactor(2,2)
-            _mm_cvtss_f32(_mm_shuffle_ps(adj10_adj11, adj10_adj11, _MM_SHUFFLE(2, 2, 2, 2))),  // cofactor(1,2)
-            _mm_cvtss_f32(_mm_shuffle_ps(adj00_adj01, adj00_adj01, _MM_SHUFFLE(2, 2, 2, 2)))); // cofactor(0,2)
+            _mm_cvtss_f32(_mm_shuffle_ps(adj20_adj21, adj20_adj21, _MM_SHUFFLE(2, 2, 2, 2))),
+            _mm_cvtss_f32(_mm_shuffle_ps(adj10_adj11, adj10_adj11, _MM_SHUFFLE(2, 2, 2, 2))),
+            _mm_cvtss_f32(_mm_shuffle_ps(adj00_adj01, adj00_adj01, _MM_SHUFFLE(2, 2, 2, 2))));
 
         float3x3 result;
         _mm_store_ps(&result.col0_.x, result_col0);
@@ -536,7 +500,6 @@
         float3x3 inv = model.inverted();
         float3x3 result = inv.transposed();
 
-        // Normalize columns for numerical stability
         float3 col0 = result.col0().normalize();
         float3 col1 = result.col1().normalize();
         float3 col2 = result.col2().normalize();
@@ -546,13 +509,11 @@
 
     inline float float3x3::trace() const noexcept
     {
-        // Trace = sum of diagonal elements
         return col0_.x + col1_.y + col2_.z;
     }
 
     inline float3 float3x3::diagonal() const noexcept
     {
-        // Extract diagonal elements from columns
         return float3(col0_.x, col1_.y, col2_.z);
     }
 
@@ -574,12 +535,11 @@
     }
 
     // ============================================================================
-    // Vector Transformations Implementation (COLUMN-MAJOR)
+    // Vector Transformations Implementation
     // ============================================================================
 
     inline float3 float3x3::transform_vector(const float3& vec) const noexcept
     {
-        // COLUMN-MAJOR: result = col0*vec.x + col1*vec.y + col2*vec.z
         __m128 v = _mm_set_ps(0.0f, vec.z, vec.y, vec.x);
         __m128 vx = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 0, 0));
         __m128 vy = _mm_shuffle_ps(v, v, _MM_SHUFFLE(1, 1, 1, 1));
@@ -598,32 +558,38 @@
 
     inline float3 float3x3::transform_point(const float3& point) const noexcept
     {
-        // For 3x3 matrix, same as vector transformation
         return transform_vector(point);
     }
 
     inline float3 float3x3::transform_normal(const float3& normal) const noexcept
     {
-        // Transform normal with transpose(inverse(matrix))
-        // Equivalent to: (inverse(matrix))^T * normal
-        float3x3 inv = this->inverted();
-        float3x3 normalMat = inv.transposed();
-        return normalMat.transform_vector(normal);
+        __m128 n = _mm_set_ps(0.0f, normal.z, normal.y, normal.x);
+
+        __m128 row0 = _mm_set_ps(0.0f, col2_.x, col1_.x, col0_.x);
+        __m128 row1 = _mm_set_ps(0.0f, col2_.y, col1_.y, col0_.y);
+        __m128 row2 = _mm_set_ps(0.0f, col2_.z, col1_.z, col0_.z);
+
+        __m128 result = _mm_mul_ps(row0, _mm_shuffle_ps(n, n, _MM_SHUFFLE(0, 0, 0, 0)));
+        result = _mm_add_ps(result, _mm_mul_ps(row1, _mm_shuffle_ps(n, n, _MM_SHUFFLE(1, 1, 1, 1))));
+        result = _mm_add_ps(result, _mm_mul_ps(row2, _mm_shuffle_ps(n, n, _MM_SHUFFLE(2, 2, 2, 2))));
+
+        __m128 len = _mm_sqrt_ps(_mm_dp_ps(result, result, 0x7F));
+        result = _mm_div_ps(result, len);
+
+        return float3(result);
     }
 
     // ============================================================================
-    // Decomposition Methods Implementation (COLUMN-MAJOR aware)
+    // Decomposition Methods Implementation
     // ============================================================================
 
     inline float3 float3x3::extract_scale() const noexcept
     {
-        // Scale factors are lengths of column vectors
         return float3(col0_.length(), col1_.length(), col2_.length());
     }
 
     inline float3x3 float3x3::extract_rotation() const noexcept
     {
-        // Gram-Schmidt orthogonalization on columns
         if (is_orthonormal(1e-4f)) {
             return *this;
         }
@@ -632,17 +598,14 @@
         __m128 c1 = _mm_load_ps(&col1_.x);
         __m128 c2 = _mm_load_ps(&col2_.x);
 
-        // Normalize first column
         __m128 len0 = _mm_sqrt_ps(_mm_dp_ps(c0, c0, 0x7F));
         c0 = _mm_div_ps(c0, len0);
 
-        // Orthogonalize second column against first
         __m128 dot01 = _mm_dp_ps(c1, c0, 0x7F);
         c1 = _mm_sub_ps(c1, _mm_mul_ps(dot01, c0));
         __m128 len1 = _mm_sqrt_ps(_mm_dp_ps(c1, c1, 0x7F));
         c1 = _mm_div_ps(c1, len1);
 
-        // Third column as cross product of first two (ensures right-handed)
         __m128 c0_yzx = _mm_shuffle_ps(c0, c0, _MM_SHUFFLE(3, 0, 2, 1));
         __m128 c1_yzx = _mm_shuffle_ps(c1, c1, _MM_SHUFFLE(3, 0, 2, 1));
         __m128 c0_zxy = _mm_shuffle_ps(c0, c0, _MM_SHUFFLE(3, 1, 0, 2));
@@ -671,7 +634,6 @@
 
     inline bool float3x3::is_orthogonal(float epsilon) const noexcept
     {
-        // Check if columns are mutually orthogonal
         return MathFunctions::approximately(dot(col0(), col1()), 0.0f, epsilon) &&
             MathFunctions::approximately(dot(col0(), col2()), 0.0f, epsilon) &&
             MathFunctions::approximately(dot(col1(), col2()), 0.0f, epsilon);
@@ -706,26 +668,24 @@
             "[%8.4f, %8.4f, %8.4f]\n"
             "[%8.4f, %8.4f, %8.4f]\n"
             "[%8.4f, %8.4f, %8.4f]",
-            (*this)(0, 0), (*this)(0, 1), (*this)(0, 2),  // Row 0
-            (*this)(1, 0), (*this)(1, 1), (*this)(1, 2),  // Row 1
-            (*this)(2, 0), (*this)(2, 1), (*this)(2, 2)); // Row 2
+            (*this)(0, 0), (*this)(0, 1), (*this)(0, 2),
+            (*this)(1, 0), (*this)(1, 1), (*this)(1, 2),
+            (*this)(2, 0), (*this)(2, 1), (*this)(2, 2));
         return std::string(buffer);
     }
 
     inline void float3x3::to_column_major(float* data) const noexcept
     {
-        // Store in COLUMN-MAJOR order: col0, col1, col2
-        data[0] = col0_.x; data[1] = col0_.y; data[2] = col0_.z;  // Column 0
-        data[3] = col1_.x; data[4] = col1_.y; data[5] = col1_.z;  // Column 1
-        data[6] = col2_.x; data[7] = col2_.y; data[8] = col2_.z;  // Column 2
+        data[0] = col0_.x; data[1] = col0_.y; data[2] = col0_.z;
+        data[3] = col1_.x; data[4] = col1_.y; data[5] = col1_.z;
+        data[6] = col2_.x; data[7] = col2_.y; data[8] = col2_.z;
     }
 
     inline void float3x3::to_row_major(float* data) const noexcept
     {
-        // Store in ROW-MAJOR order: row0, row1, row2
-        data[0] = col0_.x; data[1] = col1_.x; data[2] = col2_.x;  // Row 0
-        data[3] = col0_.y; data[4] = col1_.y; data[5] = col2_.y;  // Row 1
-        data[6] = col0_.z; data[7] = col1_.z; data[8] = col2_.z;  // Row 2
+        data[0] = col0_.x; data[1] = col1_.x; data[2] = col2_.x;
+        data[3] = col0_.y; data[4] = col1_.y; data[5] = col2_.y;
+        data[6] = col0_.z; data[7] = col1_.z; data[8] = col2_.z;
     }
 
     inline bool float3x3::isValid() const noexcept
@@ -752,7 +712,7 @@
     }
 
     // ============================================================================
-    // Binary Operators Implementation (Global) - COLUMN-MAJOR aware
+    // Binary Operators Implementation (Global)
     // ============================================================================
 
     inline float3x3 operator+(float3x3 lhs, const float3x3& rhs) noexcept { return lhs += rhs; }
@@ -760,8 +720,6 @@
 
     inline float3x3 operator*(const float3x3& lhs, const float3x3& rhs) noexcept
     {
-        // Standard matrix multiplication for COLUMN-MAJOR matrices
-        // Result[i][j] = sum_k lhs[i][k] * rhs[k][j]
         float3x3 result;
 
         const float* l = &lhs.col0_.x;
@@ -771,7 +729,6 @@
         for (int j = 0; j < 3; ++j) {
             __m128 sum = _mm_setzero_ps();
 
-            // Multiply lhs columns by rhs column j elements
             __m128 rhs_val0 = _mm_set1_ps(r[j * 4 + 0]);
             __m128 lhs_col0 = _mm_load_ps(l + 0 * 4);
             sum = _mm_add_ps(sum, _mm_mul_ps(rhs_val0, lhs_col0));
@@ -796,19 +753,11 @@
 
     inline float3 operator*(const float3& vec, const float3x3& mat) noexcept
     {
-        // Vector-matrix multiplication (vector as row vector)
-        // result.x = dot(vec, mat.col0), result.y = dot(vec, mat.col1), result.z = dot(vec, mat.col2)
-        return float3(
-            dot(vec, mat.col0()),
-            dot(vec, mat.col1()),
-            dot(vec, mat.col2())
-        );
+        return mat.transform_vector(vec);
     }
 
     inline float3 operator*(const float3x3& mat, const float3& vec) noexcept
     {
-        // Matrix-vector multiplication (vector as column vector)
-        // Standard COLUMN-MAJOR transformation
         return mat.transform_vector(vec);
     }
 
@@ -819,10 +768,8 @@
     inline float3x3 transpose(const float3x3& mat) noexcept { return mat.transposed(); }
     inline float3x3 inverse(const float3x3& mat) noexcept { return mat.inverted(); }
     inline float determinant(const float3x3& mat) noexcept { return mat.determinant(); }
-
     inline float3 mul(const float3& vec, const float3x3& mat) noexcept { return vec * mat; }
     inline float3x3 mul(const float3x3& lhs, const float3x3& rhs) noexcept { return lhs * rhs; }
-
     inline float trace(const float3x3& mat) noexcept { return mat.trace(); }
     inline float3 diagonal(const float3x3& mat) noexcept { return mat.diagonal(); }
     inline float frobenius_norm(const float3x3& mat) noexcept { return mat.frobenius_norm(); }
