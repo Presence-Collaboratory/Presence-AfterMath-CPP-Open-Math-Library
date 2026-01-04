@@ -1,6 +1,6 @@
 ﻿// Description: 3x3 matrix class with comprehensive mathematical operations,
 //              SSE optimization, and full linear algebra support
-// Author: NSDeathman, DeepSeek
+// Author: NSDeathMan, DeepSeek
 #pragma once
 
 #include <cmath>
@@ -24,11 +24,16 @@ namespace Math
      * @class float3x3
      * @brief 3x3 matrix class with comprehensive mathematical operations
      *
-     * Represents a 3x3 matrix stored in column-major order with SSE optimization.
-     * Provides comprehensive linear algebra operations including matrix multiplication,
-     * inversion, determinant calculation, and various matrix decompositions.
+     * Represents a 3x3 matrix stored in STRICT COLUMN-MAJOR ORDER with SSE optimization.
+     * Memory layout: column0, column1, column2
      *
-     * @note Column-major storage for compatibility with OpenGL and modern graphics APIs
+     * Matrix indexing: m[col][row]
+     * Visual representation (for display purposes only):
+     * [ m00 m01 m02 ]   where: m00 = col0.x, m01 = col1.x, m02 = col2.x
+     * [ m10 m11 m12 ]         m10 = col0.y, m11 = col1.y, m12 = col2.y
+     * [ m20 m21 m22 ]         m20 = col0.z, m21 = col1.z, m22 = col2.z
+     *
+     * @note STRICT COLUMN-MAJOR storage for compatibility with OpenGL, DirectX, and modern graphics APIs
      * @note SSE optimized for performance-critical operations
      * @note Perfect for 3D transformations, normal matrices, and linear algebra
      */
@@ -36,7 +41,8 @@ namespace Math
     {
     public:
         // Store matrix as three float4 for alignment and SSE optimization
-        // Each column is stored in float4 (fourth component unused)
+        // Memory layout: column0, column1, column2 (STRICT COLUMN-MAJOR)
+        // Each column is stored in float4 (fourth component unused for padding/alignment)
         alignas(16) float4 col0_, col1_, col2_;
 
     public:
@@ -45,39 +51,39 @@ namespace Math
         // ============================================================================
 
         /**
-         * @brief Default constructor (initializes to zero matrix)
+         * @brief Default constructor (initializes to identity matrix)
          */
         float3x3() noexcept;
 
         /**
-         * @brief Construct from column vectors
-         * @param col0 First column vector
-         * @param col1 Second column vector
-         * @param col2 Third column vector
+         * @brief Construct from column vectors (COLUMN-MAJOR)
+         * @param col0 First column vector (becomes column 0)
+         * @param col1 Second column vector (becomes column 1)
+         * @param col2 Third column vector (becomes column 2)
          */
         float3x3(const float3& col0, const float3& col1, const float3& col2) noexcept;
 
         /**
-         * @brief Construct from 9 scalar values (row-major order)
-         * @param m00 Element at row 0, column 0
-         * @param m01 Element at row 0, column 1
-         * @param m02 Element at row 0, column 2
-         * @param m10 Element at row 1, column 0
-         * @param m11 Element at row 1, column 1
-         * @param m12 Element at row 1, column 2
-         * @param m20 Element at row 2, column 0
-         * @param m21 Element at row 2, column 1
-         * @param m22 Element at row 2, column 2
-         * @note Parameters are in row-major order for intuitive initialization
-         * @note Internally converts to column-major storage
+         * @brief Construct from 9 scalar values (ROW-MAJOR input, converted to COLUMN-MAJOR storage)
+         * @param m00 Element at row 0, column 0 (becomes col0.x)
+         * @param m01 Element at row 0, column 1 (becomes col1.x)
+         * @param m02 Element at row 0, column 2 (becomes col2.x)
+         * @param m10 Element at row 1, column 0 (becomes col0.y)
+         * @param m11 Element at row 1, column 1 (becomes col1.y)
+         * @param m12 Element at row 1, column 2 (becomes col2.y)
+         * @param m20 Element at row 2, column 0 (becomes col0.z)
+         * @param m21 Element at row 2, column 1 (becomes col1.z)
+         * @param m22 Element at row 2, column 2 (becomes col2.z)
+         * @note Parameters are in ROW-MAJOR order for intuitive initialization
+         * @note Internally converts to COLUMN-MAJOR storage
          */
         float3x3(float m00, float m01, float m02,
             float m10, float m11, float m12,
             float m20, float m21, float m22) noexcept;
 
         /**
-         * @brief Construct from row-major array (converts to column-major)
-         * @param data Row-major array of 9 elements
+         * @brief Construct from ROW-MAJOR array (converts to COLUMN-MAJOR storage)
+         * @param data ROW-MAJOR array of 9 elements: [r0c0, r0c1, r0c2, r1c0, r1c1, r1c2, r2c0, r2c1, r2c2]
          */
         explicit float3x3(const float* data) noexcept;
 
@@ -95,7 +101,7 @@ namespace Math
 
         /**
          * @brief Construct from 4x4 matrix (extracts upper-left 3x3)
-         * @param mat4x4 4x4 matrix to extract from
+         * @param mat4x4 4x4 matrix to extract from (assumed COLUMN-MAJOR)
          * @note Uses SSE optimization for efficient extraction
          */
         explicit float3x3(const float4x4& mat4x4) noexcept;
@@ -123,45 +129,45 @@ namespace Math
 
         /**
          * @brief Assignment from 4x4 matrix
-         * @param mat4x4 4x4 matrix to extract from
+         * @param mat4x4 4x4 matrix to extract from (assumed COLUMN-MAJOR)
          * @return Reference to this matrix
          * @note Uses SSE optimization for efficient extraction
          */
         float3x3& operator=(const float4x4& mat4x4) noexcept;
 
         // ============================================================================
-        // Access Operators
+        // Access Operators (COLUMN-MAJOR indexing)
         // ============================================================================
 
         /**
-         * @brief Access column by index
+         * @brief Access column by index (COLUMN-MAJOR)
          * @param colIndex Column index (0, 1, or 2)
          * @return Reference to column as float3
-         * @note Column-major storage: [col][row]
+         * @note COLUMN-MAJOR storage: m[col][row]
          */
         float3& operator[](int colIndex) noexcept;
 
         /**
-         * @brief Access column by index (const)
+         * @brief Access column by index (const) (COLUMN-MAJOR)
          * @param colIndex Column index (0, 1, or 2)
          * @return Const reference to column as float3
          */
         const float3& operator[](int colIndex) const noexcept;
 
         /**
-         * @brief Access element by row and column (column-major)
+         * @brief Access element by row and column (COLUMN-MAJOR)
          * @param row Row index (0, 1, or 2)
          * @param col Column index (0, 1, or 2)
-         * @return Reference to element
-         * @note Column-major: [col][row]
+         * @return Reference to element at (row, col)
+         * @note COLUMN-MAJOR: m[col][row]
          */
         float& operator()(int row, int col) noexcept;
 
         /**
-         * @brief Access element by row and column (const)
+         * @brief Access element by row and column (const) (COLUMN-MAJOR)
          * @param row Row index (0, 1, or 2)
          * @param col Column index (0, 1, or 2)
-         * @return Const reference to element
+         * @return Const reference to element at (row, col)
          */
         const float& operator()(int row, int col) const noexcept;
 
@@ -170,79 +176,79 @@ namespace Math
         // ============================================================================
 
         /**
-         * @brief Get column 0
+         * @brief Get column 0 (COLUMN-MAJOR)
          * @return First column as float3
          */
         float3 col0() const noexcept;
 
         /**
-         * @brief Get column 1
+         * @brief Get column 1 (COLUMN-MAJOR)
          * @return Second column as float3
          */
         float3 col1() const noexcept;
 
         /**
-         * @brief Get column 2
+         * @brief Get column 2 (COLUMN-MAJOR)
          * @return Third column as float3
          */
         float3 col2() const noexcept;
 
         /**
-         * @brief Get row 0
+         * @brief Get row 0 (extracted from columns)
          * @return First row as float3
          */
         float3 row0() const noexcept;
 
         /**
-         * @brief Get row 1
+         * @brief Get row 1 (extracted from columns)
          * @return Second row as float3
          */
         float3 row1() const noexcept;
 
         /**
-         * @brief Get row 2
+         * @brief Get row 2 (extracted from columns)
          * @return Third row as float3
          */
         float3 row2() const noexcept;
 
         /**
-         * @brief Set column 0
+         * @brief Set column 0 (COLUMN-MAJOR)
          * @param col New column values
          */
         void set_col0(const float3& col) noexcept;
 
         /**
-         * @brief Set column 1
+         * @brief Set column 1 (COLUMN-MAJOR)
          * @param col New column values
          */
         void set_col1(const float3& col) noexcept;
 
         /**
-         * @brief Set column 2
+         * @brief Set column 2 (COLUMN-MAJOR)
          * @param col New column values
          */
         void set_col2(const float3& col) noexcept;
 
         /**
-         * @brief Set row 0
+         * @brief Set row 0 (distributes to columns)
          * @param row New row values
          */
         void set_row0(const float3& row) noexcept;
 
         /**
-         * @brief Set row 1
+         * @brief Set row 1 (distributes to columns)
          * @param row New row values
          */
         void set_row1(const float3& row) noexcept;
 
         /**
-         * @brief Set row 2
+         * @brief Set row 2 (distributes to columns)
          * @param row New row values
          */
         void set_row2(const float3& row) noexcept;
 
         // ============================================================================
-        // Static Constructors
+        // Static Constructors (all return COLUMN-MAJOR matrices)
         // ============================================================================
 
         /**
@@ -266,13 +272,13 @@ namespace Math
         bool approximately_zero(float epsilon = Constants::Constants<float>::Epsilon) const noexcept;
 
         /**
-         * @brief Scaling matrix
+         * @brief Scaling matrix (COLUMN-MAJOR)
          * @param scale Scale factors for x, y, z axes
          * @return Scaling matrix
          */
         static float3x3 scaling(const float3& scale) noexcept;
 
-        static float3x3 scaling(const float& scaleX, const float& scaleY, const float& scaleZ) noexcept;
+        static float3x3 scaling(const float scaleX, const float scaleY, const float scaleZ) noexcept;
 
         /**
          * @brief Scaling matrix from uniform scale
@@ -282,28 +288,28 @@ namespace Math
         static float3x3 scaling(float scale) noexcept;
 
         /**
-         * @brief Rotation matrix around X axis
+         * @brief Rotation matrix around X axis (COLUMN-MAJOR)
          * @param angle Rotation angle in radians
          * @return Rotation matrix around X
          */
         static float3x3 rotation_x(float angle) noexcept;
 
         /**
-         * @brief Rotation matrix around Y axis
+         * @brief Rotation matrix around Y axis (COLUMN-MAJOR)
          * @param angle Rotation angle in radians
          * @return Rotation matrix around Y
          */
         static float3x3 rotation_y(float angle) noexcept;
 
         /**
-         * @brief Rotation matrix around Z axis
+         * @brief Rotation matrix around Z axis (COLUMN-MAJOR)
          * @param angle Rotation angle in radians
          * @return Rotation matrix around Z
          */
         static float3x3 rotation_z(float angle) noexcept;
 
         /**
-         * @brief Rotation matrix from axis and angle
+         * @brief Rotation matrix from axis and angle (COLUMN-MAJOR)
          * @param axis Rotation axis (must be normalized)
          * @param angle Rotation angle in radians
          * @return Rotation matrix
@@ -311,10 +317,11 @@ namespace Math
         static float3x3 rotation_axis(const float3& axis, float angle) noexcept;
 
         /**
-         * @brief Rotation matrix from Euler angles (ZYX order)
+         * @brief Rotation matrix from Euler angles (ZYX order, COLUMN-MAJOR)
          * @param angles Euler angles in radians (pitch, yaw, roll)
          * @return Rotation matrix
          * @note Order: rotation_z(angles.z) * rotation_y(angles.y) * rotation_x(angles.x)
+         * @note For COLUMN-MAJOR: M = Mz * My * Mx
          */
         static float3x3 rotation_euler(const float3& angles) noexcept;
 
@@ -326,15 +333,15 @@ namespace Math
         static float3x3 skew_symmetric(const float3& vec) noexcept;
 
         /**
-         * @brief Outer product matrix (u * v^T)
+         * @brief Outer product matrix (u * v^T) (COLUMN-MAJOR)
          * @param u First vector
          * @param v Second vector
-         * @return Outer product matrix
+         * @return Outer product matrix where column i = u * v[i]
          */
         static float3x3 outer_product(const float3& u, const float3& v) noexcept;
 
         // ============================================================================
-        // Compound Assignment Operators (SSE Optimized)
+        // Compound Assignment Operators (SSE Optimized, preserve COLUMN-MAJOR)
         // ============================================================================
 
         /**
@@ -370,9 +377,10 @@ namespace Math
         float3x3& operator/=(float scalar) noexcept;
 
         /**
-         * @brief Matrix multiplication assignment
+         * @brief Matrix multiplication assignment (COLUMN-MAJOR)
          * @param rhs Right-hand side matrix
          * @return Reference to this matrix
+         * @note A *= B means: A = A * B (standard matrix multiplication)
          */
         float3x3& operator*=(const float3x3& rhs) noexcept;
 
@@ -393,7 +401,7 @@ namespace Math
         float3x3 operator-() const noexcept;
 
         // ============================================================================
-        // Matrix Operations (SSE Optimized)
+        // Matrix Operations (SSE Optimized, COLUMN-MAJOR)
         // ============================================================================
 
         /**
@@ -407,6 +415,7 @@ namespace Math
          * @brief Compute matrix determinant
          * @return Determinant value
          * @note Formula: a(ei − fh) − b(di − fg) + c(dh − eg)
+         * @note For COLUMN-MAJOR: det = col0·(col1×col2)
          */
         float determinant() const noexcept;
 
@@ -457,14 +466,15 @@ namespace Math
         float3x3 skew_symmetric_part() const noexcept;
 
         // ============================================================================
-        // Vector Transformations (SSE Optimized)
+        // Vector Transformations (SSE Optimized, COLUMN-MAJOR)
         // ============================================================================
 
         /**
-         * @brief Transform vector (matrix * vector)
+         * @brief Transform vector (matrix * vector) - COLUMN-MAJOR multiplication
          * @param vec Vector to transform
          * @return Transformed vector
          * @note SSE optimized matrix-vector multiplication
+         * @note For COLUMN-MAJOR: result = col0*vec.x + col1*vec.y + col2*vec.z
          */
         float3 transform_vector(const float3& vec) const noexcept;
 
@@ -485,13 +495,13 @@ namespace Math
         float3 transform_normal(const float3& normal) const noexcept;
 
         // ============================================================================
-        // Decomposition Methods
+        // Decomposition Methods (COLUMN-MAJOR aware)
         // ============================================================================
 
         /**
          * @brief Extract scale factors from transformation matrix
-         * @return Scale factors as float3
-         * @note Computes length of each column vector
+         * @return Scale factors as float3 (length of each column)
+         * @note For COLUMN-MAJOR: scale.x = |col0|, scale.y = |col1|, scale.z = |col2|
          */
         float3 extract_scale() const noexcept;
 
@@ -538,21 +548,21 @@ namespace Math
         /**
          * @brief Convert to string representation
          * @return String representation of matrix
-         * @note Format: "[row0]\n[row1]\n[row2]"
+         * @note Format: "[row0]\n[row1]\n[row2]" (displayed as rows for readability)
          */
         std::string to_string() const;
 
         /**
-         * @brief Store matrix to column-major array
+         * @brief Store matrix to COLUMN-MAJOR array
          * @param data Destination array (must have at least 9 elements)
-         * @note Column-major order: [col0.x, col0.y, col0.z, col1.x, ...]
+         * @note COLUMN-MAJOR order: [col0.x, col0.y, col0.z, col1.x, col1.y, col1.z, col2.x, col2.y, col2.z]
          */
         void to_column_major(float* data) const noexcept;
 
         /**
-         * @brief Store matrix to row-major array
+         * @brief Store matrix to ROW-MAJOR array
          * @param data Destination array (must have at least 9 elements)
-         * @note Row-major order: [row0.x, row0.y, row0.z, row1.x, ...]
+         * @note ROW-MAJOR order: [row0.x, row0.y, row0.z, row1.x, row1.y, row1.z, row2.x, row2.y, row2.z]
          */
         void to_row_major(float* data) const noexcept;
 
@@ -574,31 +584,75 @@ namespace Math
          */
         bool operator!=(const float3x3& rhs) const noexcept;
 
+        /**
+         * @brief Check if matrix contains valid finite values
+         * @return True if all elements are finite
+         */
         bool isValid() const noexcept;
     };
 
     // ============================================================================
-    // Binary Operators
+    // Binary Operators (COLUMN-MAJOR aware)
     // ============================================================================
 
     float3x3 operator+(float3x3 lhs, const float3x3& rhs) noexcept;
     float3x3 operator-(float3x3 lhs, const float3x3& rhs) noexcept;
+
+    /**
+     * @brief Matrix multiplication (COLUMN-MAJOR)
+     * @param lhs Left-hand side matrix
+     * @param rhs Right-hand side matrix
+     * @return Result of lhs * rhs
+     * @note Standard matrix multiplication
+     */
     float3x3 operator*(const float3x3& lhs, const float3x3& rhs) noexcept;
+
     float3x3 operator*(float3x3 mat, float scalar) noexcept;
     float3x3 operator*(float scalar, float3x3 mat) noexcept;
     float3x3 operator/(float3x3 mat, float scalar) noexcept;
+
+    /**
+     * @brief Vector-matrix multiplication (vector * matrix) - POST-multiplication
+     * @param vec Vector (as row vector)
+     * @param mat Matrix
+     * @return Transformed vector
+     * @note For COLUMN-MAJOR: result.x = dot(vec, col0), result.y = dot(vec, col1), result.z = dot(vec, col2)
+     */
     float3 operator*(const float3& vec, const float3x3& mat) noexcept;
+
+    /**
+     * @brief Matrix-vector multiplication (matrix * vector) - PRE-multiplication
+     * @param mat Matrix
+     * @param vec Vector (as column vector)
+     * @return Transformed vector
+     * @note For COLUMN-MAJOR: result = col0*vec.x + col1*vec.y + col2*vec.z
+     */
     float3 operator*(const float3x3& mat, const float3& vec) noexcept;
 
     // ============================================================================
-    // Global Functions
+    // Global Functions (COLUMN-MAJOR aware)
     // ============================================================================
 
     float3x3 transpose(const float3x3& mat) noexcept;
     float3x3 inverse(const float3x3& mat) noexcept;
     float determinant(const float3x3& mat) noexcept;
+
+    /**
+     * @brief Vector-matrix multiplication (vector * matrix)
+     * @param vec Vector (as row vector)
+     * @param mat Matrix
+     * @return Transformed vector
+     */
     float3 mul(const float3& vec, const float3x3& mat) noexcept;
+
+    /**
+     * @brief Matrix multiplication
+     * @param lhs Left-hand side matrix
+     * @param rhs Right-hand side matrix
+     * @return Result of lhs * rhs
+     */
     float3x3 mul(const float3x3& lhs, const float3x3& rhs) noexcept;
+
     float trace(const float3x3& mat) noexcept;
     float3 diagonal(const float3x3& mat) noexcept;
     float frobenius_norm(const float3x3& mat) noexcept;
@@ -612,16 +666,16 @@ namespace Math
     float3x3 outer_product(const float3& u, const float3& v) noexcept;
 
     // ============================================================================
-    // Useful Constants
+    // Useful Constants (COLUMN-MAJOR)
     // ============================================================================
 
     /**
-     * @brief Identity matrix constant
+     * @brief Identity matrix constant (COLUMN-MAJOR)
      */
     extern const float3x3 float3x3_Identity;
 
     /**
-     * @brief Zero matrix constant
+     * @brief Zero matrix constant (COLUMN-MAJOR)
      */
     extern const float3x3 float3x3_Zero;
 

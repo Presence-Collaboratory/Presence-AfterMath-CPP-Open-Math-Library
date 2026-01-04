@@ -15,176 +15,116 @@ namespace Math
      * @brief Default constructor (initializes to identity matrix)
      */
     inline float4x4::float4x4() noexcept
-        : row0_(1, 0, 0, 0), row1_(0, 1, 0, 0), row2_(0, 0, 1, 0), row3_(0, 0, 0, 1) {}
+        : col0_(1, 0, 0, 0), col1_(0, 1, 0, 0), col2_(0, 0, 1, 0), col3_(0, 0, 0, 1) {}
 
     /**
-     * @brief Construct from row vectors
-     * @param r0 First row vector
-     * @param r1 Second row vector
-     * @param r2 Third row vector
-     * @param r3 Fourth row vector (translation/perspective)
+     * @brief Construct from column vectors
+     * @param c0 First column vector
+     * @param c1 Second column vector
+     * @param c2 Third column vector
+     * @param c3 Fourth column vector (translation/perspective)
      */
-    inline float4x4::float4x4(const float4& r0, const float4& r1, const float4& r2, const float4& r3) noexcept
-        : row0_(r0), row1_(r1), row2_(r2), row3_(r3) {}
+    inline float4x4::float4x4(const float4& c0, const float4& c1, const float4& c2, const float4& c3) noexcept
+        : col0_(c0), col1_(c1), col2_(c2), col3_(c3) {}
 
     /**
-     * @brief Construct from 16 scalar values (row-major order)
+     * @brief Construct from 16 scalar values (column-major order)
      */
-    inline float4x4::float4x4(float m00, float m01, float m02, float m03,
-        float m10, float m11, float m12, float m13,
-        float m20, float m21, float m22, float m23,
-        float m30, float m31, float m32, float m33) noexcept
-        : row0_(m00, m01, m02, m03)
-        , row1_(m10, m11, m12, m13)
-        , row2_(m20, m21, m22, m23)
-        , row3_(m30, m31, m32, m33) {}
+    inline float4x4::float4x4(float m00, float m10, float m20, float m30,
+        float m01, float m11, float m21, float m31,
+        float m02, float m12, float m22, float m32,
+        float m03, float m13, float m23, float m33) noexcept
+        : col0_(m00, m10, m20, m30)
+        , col1_(m01, m11, m21, m31)
+        , col2_(m02, m12, m22, m32)
+        , col3_(m03, m13, m23, m33) {}
 
     /**
-     * @brief Construct from row-major array
-     * @param data Row-major array of 16 elements
+     * @brief Construct from column-major array
+     * @param data Column-major array of 16 elements
      */
     inline float4x4::float4x4(const float* data) noexcept
-        : row0_(data[0], data[1], data[2], data[3])
-        , row1_(data[4], data[5], data[6], data[7])
-        , row2_(data[8], data[9], data[10], data[11])
-        , row3_(data[12], data[13], data[14], data[15]) {}
+        : col0_(data[0], data[1], data[2], data[3])
+        , col1_(data[4], data[5], data[6], data[7])
+        , col2_(data[8], data[9], data[10], data[11])
+        , col3_(data[12], data[13], data[14], data[15]) {}
 
     /**
      * @brief Construct from scalar (diagonal matrix)
      */
     inline float4x4::float4x4(float scalar) noexcept
-        : row0_(scalar, 0, 0, 0), row1_(0, scalar, 0, 0), row2_(0, 0, scalar, 0), row3_(0, 0, 0, scalar) {}
+        : col0_(scalar, 0, 0, 0), col1_(0, scalar, 0, 0), col2_(0, 0, scalar, 0), col3_(0, 0, 0, scalar) {}
 
     /**
      * @brief Construct from diagonal vector
      */
     inline float4x4::float4x4(const float4& diagonal) noexcept
-        : row0_(diagonal.x, 0, 0, 0), row1_(0, diagonal.y, 0, 0), row2_(0, 0, diagonal.z, 0), row3_(0, 0, 0, diagonal.w) {}
+        : col0_(diagonal.x, 0, 0, 0), col1_(0, diagonal.y, 0, 0), col2_(0, 0, diagonal.z, 0), col3_(0, 0, 0, diagonal.w) {}
 
     /**
      * @brief Construct from 3x3 matrix (extends to 4x4 with identity)
+     * @note float3x3 is assumed to be row-major, need to transpose for column-major
      */
     inline float4x4::float4x4(const float3x3& m) noexcept {
-        // float3x3 assumed row-major for compatibility
-        row0_ = float4(m.row0(), 0.0f);
-        row1_ = float4(m.row1(), 0.0f);
-        row2_ = float4(m.row2(), 0.0f);
-        row3_ = float4(0.0f, 0.0f, 0.0f, 1.0f);
+        // Extract rows from 3x3 matrix and set as columns for column-major
+        float3 r0 = m.row0();
+        float3 r1 = m.row1();
+        float3 r2 = m.row2();
+
+        col0_ = float4(r0.x, r1.x, r2.x, 0.0f);
+        col1_ = float4(r0.y, r1.y, r2.y, 0.0f);
+        col2_ = float4(r0.z, r1.z, r2.z, 0.0f);
+        col3_ = float4(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
     /**
      * @brief Construct from quaternion (rotation matrix)
+     * @note For column-major, we need to set the quaternion rotation matrix in columns
      */
-     /**
-      * @brief Construct from quaternion (rotation matrix) - Fully SSE optimized
-      * @param q Unit quaternion representing rotation
-      * @note Creates homogeneous rotation matrix with no translation
-      * @note Uses full SSE optimization with minimal memory access
-      */
     inline float4x4::float4x4(const quaternion& q) noexcept {
-        // Load quaternion [x, y, z, w]
-        __m128 q_simd = q.get_simd();
+        float x = q.x, y = q.y, z = q.z, w = q.w;
 
-        // Broadcast components
-        __m128 xxxx = _mm_shuffle_ps(q_simd, q_simd, _MM_SHUFFLE(0, 0, 0, 0));
-        __m128 yyyy = _mm_shuffle_ps(q_simd, q_simd, _MM_SHUFFLE(1, 1, 1, 1));
-        __m128 zzzz = _mm_shuffle_ps(q_simd, q_simd, _MM_SHUFFLE(2, 2, 2, 2));
-        __m128 wwww = _mm_shuffle_ps(q_simd, q_simd, _MM_SHUFFLE(3, 3, 3, 3));
+        // Compute common values
+        float xx = x * x;
+        float yy = y * y;
+        float zz = z * z;
+        float xy = x * y;
+        float xz = x * z;
+        float yz = y * z;
+        float wx = w * x;
+        float wy = w * y;
+        float wz = w * z;
 
-        // Compute 2q and broadcast
-        const __m128 two = _mm_set1_ps(2.0f);
-        __m128 q2 = _mm_mul_ps(q_simd, two);
+        // Column 0: [1 - 2*(yy + zz), 2*(xy + wz), 2*(xz - wy), 0]
+        float m00 = 1.0f - 2.0f * (yy + zz);
+        float m10 = 2.0f * (xy + wz);
+        float m20 = 2.0f * (xz - wy);
+        float m30 = 0.0f;
 
-        __m128 x2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(0, 0, 0, 0));
-        __m128 y2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(1, 1, 1, 1));
-        __m128 z2 = _mm_shuffle_ps(q2, q2, _MM_SHUFFLE(2, 2, 2, 2));
+        // Column 1: [2*(xy - wz), 1 - 2*(xx + zz), 2*(yz + wx), 0]
+        float m01 = 2.0f * (xy - wz);
+        float m11 = 1.0f - 2.0f * (xx + zz);
+        float m21 = 2.0f * (yz + wx);
+        float m31 = 0.0f;
 
-        // Compute products
-        __m128 xx = _mm_mul_ps(xxxx, x2);
-        __m128 yy = _mm_mul_ps(yyyy, y2);
-        __m128 zz = _mm_mul_ps(zzzz, z2);
+        // Column 2: [2*(xz + wy), 2*(yz - wx), 1 - 2*(xx + yy), 0]
+        float m02 = 2.0f * (xz + wy);
+        float m12 = 2.0f * (yz - wx);
+        float m22 = 1.0f - 2.0f * (xx + yy);
+        float m32 = 0.0f;
 
-        __m128 xy = _mm_mul_ps(xxxx, y2);
-        __m128 xz = _mm_mul_ps(xxxx, z2);
-        __m128 yz = _mm_mul_ps(yyyy, z2);
+        // Column 3: [0, 0, 0, 1]
+        float m03 = 0.0f;
+        float m13 = 0.0f;
+        float m23 = 0.0f;
+        float m33 = 1.0f;
 
-        __m128 wx = _mm_mul_ps(wwww, x2);
-        __m128 wy = _mm_mul_ps(wwww, y2);
-        __m128 wz = _mm_mul_ps(wwww, z2);
-
-        // Extract first components efficiently
-        float xx_f = _mm_cvtss_f32(xx);
-        float yy_f = _mm_cvtss_f32(_mm_shuffle_ps(yy, yy, _MM_SHUFFLE(0, 0, 0, 0)));
-        float zz_f = _mm_cvtss_f32(_mm_shuffle_ps(zz, zz, _MM_SHUFFLE(0, 0, 0, 0)));
-
-        float xy_f = _mm_cvtss_f32(_mm_shuffle_ps(xy, xy, _MM_SHUFFLE(0, 0, 0, 0)));
-        float xz_f = _mm_cvtss_f32(_mm_shuffle_ps(xz, xz, _MM_SHUFFLE(0, 0, 0, 0)));
-        float yz_f = _mm_cvtss_f32(_mm_shuffle_ps(yz, yz, _MM_SHUFFLE(0, 0, 0, 0)));
-
-        float wx_f = _mm_cvtss_f32(_mm_shuffle_ps(wx, wx, _MM_SHUFFLE(0, 0, 0, 0)));
-        float wy_f = _mm_cvtss_f32(_mm_shuffle_ps(wy, wy, _MM_SHUFFLE(0, 0, 0, 0)));
-        float wz_f = _mm_cvtss_f32(_mm_shuffle_ps(wz, wz, _MM_SHUFFLE(0, 0, 0, 0)));
-
-        // Compute final values using SSE where possible
-        const __m128 one = _mm_set1_ps(1.0f);
-        const __m128 zero = _mm_set1_ps(0.0f);
-
-        // Row 0: [1 - (yy + zz), xy + wz, xz - wy, 0]
-        __m128 yy_zz = _mm_add_ps(_mm_set1_ps(yy_f), _mm_set1_ps(zz_f));
-        __m128 m00 = _mm_sub_ps(one, yy_zz);
-        __m128 m01 = _mm_add_ps(_mm_set1_ps(xy_f), _mm_set1_ps(wz_f));
-        __m128 m02 = _mm_sub_ps(_mm_set1_ps(xz_f), _mm_set1_ps(wy_f));
-
-        // Combine row 0
-        __m128 row0 = _mm_set_ps(0.0f,
-            _mm_cvtss_f32(m02),
-            _mm_cvtss_f32(m01),
-            _mm_cvtss_f32(m00));
-
-        // Row 1: [xy - wz, 1 - (xx + zz), yz + wx, 0]
-        __m128 m10 = _mm_sub_ps(_mm_set1_ps(xy_f), _mm_set1_ps(wz_f));
-        __m128 xx_zz = _mm_add_ps(_mm_set1_ps(xx_f), _mm_set1_ps(zz_f));
-        __m128 m11 = _mm_sub_ps(one, xx_zz);
-        __m128 m12 = _mm_add_ps(_mm_set1_ps(yz_f), _mm_set1_ps(wx_f));
-
-        // Combine row 1
-        __m128 row1 = _mm_set_ps(0.0f,
-            _mm_cvtss_f32(m12),
-            _mm_cvtss_f32(m11),
-            _mm_cvtss_f32(m10));
-
-        // Row 2: [xz + wy, yz - wx, 1 - (xx + yy), 0]
-        __m128 m20 = _mm_add_ps(_mm_set1_ps(xz_f), _mm_set1_ps(wy_f));
-        __m128 m21 = _mm_sub_ps(_mm_set1_ps(yz_f), _mm_set1_ps(wx_f));
-        __m128 xx_yy = _mm_add_ps(_mm_set1_ps(xx_f), _mm_set1_ps(yy_f));
-        __m128 m22 = _mm_sub_ps(one, xx_yy);
-
-        // Combine row 2
-        __m128 row2 = _mm_set_ps(0.0f,
-            _mm_cvtss_f32(m22),
-            _mm_cvtss_f32(m21),
-            _mm_cvtss_f32(m20));
-
-        // Row 3: [0, 0, 0, 1]
-        __m128 row3 = _mm_set_ps(1.0f, 0.0f, 0.0f, 0.0f);
-
-        // Store results
-        row0_.set_simd(row0);
-        row1_.set_simd(row1);
-        row2_.set_simd(row2);
-        row3_.set_simd(row3);
+        // Set columns
+        col0_ = float4(m00, m10, m20, m30);
+        col1_ = float4(m01, m11, m21, m31);
+        col2_ = float4(m02, m12, m22, m32);
+        col3_ = float4(m03, m13, m23, m33);
     }
-
-#if defined(MATH_SUPPORT_D3DX)
-    /**
-     * @brief Construct from D3DXMATRIX
-     */
-    inline float4x4::float4x4(const D3DXMATRIX& mat) noexcept
-        : row0_(mat._11, mat._12, mat._13, mat._14)
-        , row1_(mat._21, mat._22, mat._23, mat._24)
-        , row2_(mat._31, mat._32, mat._33, mat._34)
-        , row3_(mat._41, mat._42, mat._43, mat._44) {}
-#endif
 
     // ============================================================================
     // Static Constructors
@@ -196,7 +136,10 @@ namespace Math
     // --- Transformations ---
 
     inline float4x4 float4x4::translation(float x, float y, float z) noexcept {
-        return float4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1);
+        return float4x4(1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            x, y, z, 1);
     }
 
     inline float4x4 float4x4::translation(const float3& p) noexcept {
@@ -204,7 +147,10 @@ namespace Math
     }
 
     inline float4x4 float4x4::scaling(float x, float y, float z) noexcept {
-        return float4x4(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
+        return float4x4(x, 0, 0, 0,
+            0, y, 0, 0,
+            0, 0, z, 0,
+            0, 0, 0, 1);
     }
 
     inline float4x4 float4x4::scaling(const float3& s) noexcept {
@@ -218,19 +164,28 @@ namespace Math
     inline float4x4 float4x4::rotation_x(float angle) noexcept {
         float s, c;
         MathFunctions::sin_cos(angle, &s, &c);
-        return float4x4(1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1);
+        return float4x4(1, 0, 0, 0,
+            0, c, s, 0,
+            0, -s, c, 0,
+            0, 0, 0, 1);
     }
 
     inline float4x4 float4x4::rotation_y(float angle) noexcept {
         float s, c;
         MathFunctions::sin_cos(angle, &s, &c);
-        return float4x4(c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1);
+        return float4x4(c, 0, -s, 0,
+            0, 1, 0, 0,
+            s, 0, c, 0,
+            0, 0, 0, 1);
     }
 
     inline float4x4 float4x4::rotation_z(float angle) noexcept {
         float s, c;
         MathFunctions::sin_cos(angle, &s, &c);
-        return float4x4(c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+        return float4x4(c, s, 0, 0,
+            -s, c, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1);
     }
 
     inline float4x4 float4x4::rotation_axis(const float3& axis, float angle) noexcept {
@@ -239,9 +194,9 @@ namespace Math
         float t = 1.0f - c;
         float x = axis.x, y = axis.y, z = axis.z;
         return float4x4(
-            t * x * x + c, t * x * y + z * s, t * x * z - y * s, 0,
-            t * x * y - z * s, t * y * y + c, t * y * z + x * s, 0,
-            t * x * z + y * s, t * y * z - x * s, t * z * z + c, 0,
+            t * x * x + c, t * x * y - z * s, t * x * z + y * s, 0,
+            t * x * y + z * s, t * y * y + c, t * y * z - x * s, 0,
+            t * x * z - y * s, t * y * z + x * s, t * z * z + c, 0,
             0, 0, 0, 1
         );
     }
@@ -251,7 +206,7 @@ namespace Math
     }
 
     inline float4x4 float4x4::TRS(const float3& t, const quaternion& r, const float3& s) noexcept {
-        return scaling(s) * float4x4(r) * translation(t);
+        return translation(t) * float4x4(r) * scaling(s);
     }
 
     // --- Projections ---
@@ -260,30 +215,42 @@ namespace Math
         float h = 1.0f / std::tan(fov * 0.5f);
         float w = h / ar;
         float r = zf / (zf - zn);
-        return float4x4(w, 0, 0, 0, 0, h, 0, 0, 0, 0, r, 1, 0, 0, -r * zn, 0);
+        return float4x4(w, 0, 0, 0,
+            0, h, 0, 0,
+            0, 0, r, 1,
+            0, 0, -r * zn, 0);
     }
 
     inline float4x4 float4x4::perspective_rh_zo(float fov, float ar, float zn, float zf) noexcept {
         float h = 1.0f / std::tan(fov * 0.5f);
         float w = h / ar;
         float r = zf / (zn - zf);
-        return float4x4(w, 0, 0, 0, 0, h, 0, 0, 0, 0, r, -1, 0, 0, r * zn, 0);
+        return float4x4(w, 0, 0, 0,
+            0, h, 0, 0,
+            0, 0, r, -1,
+            0, 0, r * zn, 0);
     }
 
     inline float4x4 float4x4::perspective_lh_no(float fov, float ar, float zn, float zf) noexcept {
         float h = 1.0f / std::tan(fov * 0.5f);
         float w = h / ar;
-        return float4x4(w, 0, 0, 0, 0, h, 0, 0, 0, 0, (zf + zn) / (zf - zn), 1, 0, 0, -2 * zn * zf / (zf - zn), 0);
+        return float4x4(w, 0, 0, 0,
+            0, h, 0, 0,
+            0, 0, (zf + zn) / (zf - zn), 1,
+            0, 0, -2 * zn * zf / (zf - zn), 0);
     }
 
     inline float4x4 float4x4::perspective_rh_no(float fov, float ar, float zn, float zf) noexcept {
         float h = 1.0f / std::tan(fov * 0.5f);
         float w = h / ar;
-        return float4x4(w, 0, 0, 0, 0, h, 0, 0, 0, 0, -(zf + zn) / (zf - zn), -1, 0, 0, -2 * zn * zf / (zf - zn), 0);
+        return float4x4(w, 0, 0, 0,
+            0, h, 0, 0,
+            0, 0, -(zf + zn) / (zf - zn), -1,
+            0, 0, -2 * zn * zf / (zf - zn), 0);
     }
 
     inline float4x4 float4x4::perspective(float fov, float ar, float zn, float zf) noexcept {
-        return perspective_lh_zo(fov, ar, zn, zf);
+        return perspective_rh_zo(fov, ar, zn, zf);
     }
 
     inline float4x4 float4x4::orthographic_lh_zo(float width, float height, float zNear, float zFar) noexcept {
@@ -313,61 +280,84 @@ namespace Math
     // --- Cameras ---
 
     inline float4x4 float4x4::look_at_lh(const float3& eye, const float3& target, const float3& up) noexcept {
-        float3 z = (target - eye).normalize();
-        float3 x = up.cross(z).normalize();
-        float3 y = z.cross(x);
-        return float4x4(x.x, y.x, z.x, 0, x.y, y.y, z.y, 0, x.z, y.z, z.z, 0, -x.dot(eye), -y.dot(eye), -z.dot(eye), 1);
+        float3 z = (target - eye).normalize();   // Forward
+        float3 x = up.cross(z).normalize();      // Right
+        float3 y = z.cross(x);                   // Up
+
+        // Translation = -dot(axis, eye)
+        float tx = -x.dot(eye);
+        float ty = -y.dot(eye);
+        float tz = -z.dot(eye);
+
+        // For column-major: axes become columns
+        return float4x4(
+            x.x, y.x, z.x, 0.0f,  // Column 0: x-axis components
+            x.y, y.y, z.y, 0.0f,  // Column 1: y-axis components  
+            x.z, y.z, z.z, 0.0f,  // Column 2: z-axis components
+            tx, ty, tz, 1.0f   // Column 3: translation
+        );
     }
 
     inline float4x4 float4x4::look_at_rh(const float3& eye, const float3& target, const float3& up) noexcept {
-        float3 z = (eye - target).normalize();
-        float3 x = up.cross(z).normalize();
-        float3 y = z.cross(x);
-        return float4x4(x.x, y.x, z.x, 0, x.y, y.y, z.y, 0, x.z, y.z, z.z, 0, -x.dot(eye), -y.dot(eye), -z.dot(eye), 1);
+        float3 z = (eye - target).normalize();   // Backwards (RH)
+        float3 x = up.cross(z).normalize();      // Right
+        float3 y = z.cross(x);                   // Up
+
+        // Translation = -dot(axis, eye)
+        float tx = -x.dot(eye);
+        float ty = -y.dot(eye);
+        float tz = -z.dot(eye);
+
+        return float4x4(
+            x.x, y.x, z.x, 0.0f,
+            x.y, y.y, z.y, 0.0f,
+            x.z, y.z, z.z, 0.0f,
+            tx, ty, tz, 1.0f
+        );
     }
 
     inline float4x4 float4x4::look_at(const float3& eye, const float3& target, const float3& up) noexcept {
-        return look_at_lh(eye, target, up);
+        return look_at_rh(eye, target, up);
     }
 
     // ============================================================================
     // Access Operators
     // ============================================================================
 
-    inline float4& float4x4::operator[](int rowIndex) noexcept {
-        return (&row0_)[rowIndex];
+    inline float4& float4x4::operator[](int colIndex) noexcept {
+        return (&col0_)[colIndex];
     }
 
-    inline const float4& float4x4::operator[](int rowIndex) const noexcept {
-        return (&row0_)[rowIndex];
+    inline const float4& float4x4::operator[](int colIndex) const noexcept {
+        return (&col0_)[colIndex];
     }
 
-    inline float& float4x4::operator()(int r, int c) noexcept {
-        return (&row0_)[r][c];
+    inline float& float4x4::operator()(int row, int col) noexcept {
+        return (&col0_)[col][row];
     }
 
-    inline const float& float4x4::operator()(int r, int c) const noexcept {
-        return (&row0_)[r][c];
+    inline const float& float4x4::operator()(int row, int col) const noexcept {
+        return (&col0_)[col][row];
     }
 
     // ============================================================================
-    // Row and Column Accessors
+    // Column and Row Accessors
     // ============================================================================
 
-    inline float4 float4x4::col0() const noexcept {
-        return float4(row0_.x, row1_.x, row2_.x, row3_.x);
+    inline float4 float4x4::row0() const noexcept {
+        return float4(col0_.x, col1_.x, col2_.x, col3_.x);
     }
 
-    inline float4 float4x4::col1() const noexcept {
-        return float4(row0_.y, row1_.y, row2_.y, row3_.y);
+    inline float4 float4x4::row1() const noexcept {
+        return float4(col0_.y, col1_.y, col2_.y, col3_.y);
     }
 
-    inline float4 float4x4::col2() const noexcept {
-        return float4(row0_.z, row1_.z, row2_.z, row3_.z);
+    inline float4 float4x4::row2() const noexcept {
+        return float4(col0_.z, col1_.z, col2_.z, col3_.z);
     }
 
-    inline float4 float4x4::col3() const noexcept {
-        return float4(row0_.w, row1_.w, row2_.w, row3_.w);
+    inline float4 float4x4::row3() const noexcept {
+        return float4(col0_.w, col1_.w, col2_.w, col3_.w);
     }
 
     // ============================================================================
@@ -375,35 +365,35 @@ namespace Math
     // ============================================================================
 
     inline float4x4& float4x4::operator+=(const float4x4& rhs) noexcept {
-        row0_ += rhs.row0_;
-        row1_ += rhs.row1_;
-        row2_ += rhs.row2_;
-        row3_ += rhs.row3_;
+        col0_ += rhs.col0_;
+        col1_ += rhs.col1_;
+        col2_ += rhs.col2_;
+        col3_ += rhs.col3_;
         return *this;
     }
 
     inline float4x4& float4x4::operator-=(const float4x4& rhs) noexcept {
-        row0_ -= rhs.row0_;
-        row1_ -= rhs.row1_;
-        row2_ -= rhs.row2_;
-        row3_ -= rhs.row3_;
+        col0_ -= rhs.col0_;
+        col1_ -= rhs.col1_;
+        col2_ -= rhs.col2_;
+        col3_ -= rhs.col3_;
         return *this;
     }
 
     inline float4x4& float4x4::operator*=(float s) noexcept {
-        row0_ *= s;
-        row1_ *= s;
-        row2_ *= s;
-        row3_ *= s;
+        col0_ *= s;
+        col1_ *= s;
+        col2_ *= s;
+        col3_ *= s;
         return *this;
     }
 
     inline float4x4& float4x4::operator/=(float s) noexcept {
         float is = 1.0f / s;
-        row0_ *= is;
-        row1_ *= is;
-        row2_ *= is;
-        row3_ *= is;
+        col0_ *= is;
+        col1_ *= is;
+        col2_ *= is;
+        col3_ *= is;
         return *this;
     }
 
@@ -421,7 +411,7 @@ namespace Math
     }
 
     inline float4x4 float4x4::operator-() const noexcept {
-        return float4x4(-row0_, -row1_, -row2_, -row3_);
+        return float4x4(-col0_, -col1_, -col2_, -col3_);
     }
 
     // ============================================================================
@@ -432,10 +422,10 @@ namespace Math
      * @brief Compute transposed matrix (SSE optimized)
      */
     inline float4x4 float4x4::transposed() const noexcept {
-        __m128 t0 = _mm_shuffle_ps(row0_.get_simd(), row1_.get_simd(), 0x44);
-        __m128 t2 = _mm_shuffle_ps(row0_.get_simd(), row1_.get_simd(), 0xEE);
-        __m128 t1 = _mm_shuffle_ps(row2_.get_simd(), row3_.get_simd(), 0x44);
-        __m128 t3 = _mm_shuffle_ps(row2_.get_simd(), row3_.get_simd(), 0xEE);
+        __m128 t0 = _mm_shuffle_ps(col0_.get_simd(), col1_.get_simd(), 0x44);
+        __m128 t2 = _mm_shuffle_ps(col0_.get_simd(), col1_.get_simd(), 0xEE);
+        __m128 t1 = _mm_shuffle_ps(col2_.get_simd(), col3_.get_simd(), 0x44);
+        __m128 t3 = _mm_shuffle_ps(col2_.get_simd(), col3_.get_simd(), 0xEE);
         return float4x4(
             float4(_mm_shuffle_ps(t0, t1, 0x88)),
             float4(_mm_shuffle_ps(t0, t1, 0xDD)),
@@ -448,10 +438,10 @@ namespace Math
      * @brief Compute matrix determinant
      */
     inline float float4x4::determinant() const noexcept {
-        float m00 = row0_.x, m01 = row0_.y, m02 = row0_.z, m03 = row0_.w;
-        float m10 = row1_.x, m11 = row1_.y, m12 = row1_.z, m13 = row1_.w;
-        float m20 = row2_.x, m21 = row2_.y, m22 = row2_.z, m23 = row2_.w;
-        float m30 = row3_.x, m31 = row3_.y, m32 = row3_.z, m33 = row3_.w;
+        float m00 = col0_.x, m10 = col0_.y, m20 = col0_.z, m30 = col0_.w;
+        float m01 = col1_.x, m11 = col1_.y, m21 = col1_.z, m31 = col1_.w;
+        float m02 = col2_.x, m12 = col2_.y, m22 = col2_.z, m32 = col2_.w;
+        float m03 = col3_.x, m13 = col3_.y, m23 = col3_.z, m33 = col3_.w;
 
         return m03 * m12 * m21 * m30 - m02 * m13 * m21 * m30 - m03 * m11 * m22 * m30 + m01 * m13 * m22 * m30 +
             m02 * m11 * m23 * m30 - m01 * m12 * m23 * m30 - m03 * m12 * m20 * m31 + m02 * m13 * m20 * m31 +
@@ -462,16 +452,17 @@ namespace Math
     }
 
     inline float4x4 float4x4::inverted_affine() const noexcept {
-        const float3 r0 = row0_.xyz();
-        const float3 r1 = row1_.xyz();
-        const float3 r2 = row2_.xyz();
-        const float3 translation = get_translation();
+        const float3 c0 = col0_.xyz();
+        const float3 c1 = col1_.xyz();
+        const float3 c2 = col2_.xyz();
+        const float3 t = get_translation();
 
-        const float3 cross_12 = r1.cross(r2);
-        const float3 cross_20 = r2.cross(r0);
-        const float3 cross_01 = r0.cross(r1);
+        // Cross products compute unnormalized ROWS of the inverse linear part
+        const float3 r0 = c1.cross(c2);  // First row of 3x3 inverse
+        const float3 r1 = c2.cross(c0);  // Second row of 3x3 inverse
+        const float3 r2 = c0.cross(c1);  // Third row of 3x3 inverse
 
-        const float det = r0.dot(cross_12);
+        const float det = c0.dot(r0);
 
         if (std::abs(det) < Constants::Constants<float>::Epsilon) {
             return identity();
@@ -479,21 +470,23 @@ namespace Math
 
         const float inv_det = 1.0f / det;
 
-        const float3 inv_col0 = cross_12 * inv_det;
-        const float3 inv_col1 = cross_20 * inv_det;
-        const float3 inv_col2 = cross_01 * inv_det;
+        // Apply inverse determinant to get actual rows
+        const float3 inv_row0 = r0 * inv_det;
+        const float3 inv_row1 = r1 * inv_det;
+        const float3 inv_row2 = r2 * inv_det;
 
-        // R^-1 * Translation
-        // InvT = -(Inv * T)
-        float x = -(inv_col0.x * translation.x + inv_col1.x * translation.y + inv_col2.x * translation.z);
-        float y = -(inv_col0.y * translation.x + inv_col1.y * translation.y + inv_col2.y * translation.z);
-        float z = -(inv_col0.z * translation.x + inv_col1.z * translation.y + inv_col2.z * translation.z);
+        // Calculate inverse translation: T' = -InvLinear * T
+        float tx = -inv_row0.dot(t);
+        float ty = -inv_row1.dot(t);
+        float tz = -inv_row2.dot(t);
 
+        // For column-major: rows become columns
+        // inv_row0.x becomes column0.x, inv_row1.x becomes column0.y, etc.
         return float4x4(
-            inv_col0.x, inv_col1.x, inv_col2.x, 0.0f,
-            inv_col0.y, inv_col1.y, inv_col2.y, 0.0f,
-            inv_col0.z, inv_col1.z, inv_col2.z, 0.0f,
-            x, y, z, 1.0f
+            inv_row0.x, inv_row1.x, inv_row2.x, 0.0f,  // Column 0
+            inv_row0.y, inv_row1.y, inv_row2.y, 0.0f,  // Column 1
+            inv_row0.z, inv_row1.z, inv_row2.z, 0.0f,  // Column 2
+            tx, ty, tz, 1.0f                           // Column 3
         );
     }
 
@@ -512,303 +505,83 @@ namespace Math
 
     /**
      * @brief Compute adjugate matrix (Fully SSE optimized)
-     * @return Adjugate matrix
-     * @note Fully SSE optimized version using vectorized 2x2 determinant computations
      */
     inline float4x4 float4x4::adjugate() const noexcept {
-        // Load all rows
-        __m128 r0 = row0_.get_simd(); // [a, b, c, d]
-        __m128 r1 = row1_.get_simd(); // [e, f, g, h]
-        __m128 r2 = row2_.get_simd(); // [i, j, k, l]
-        __m128 r3 = row3_.get_simd(); // [m, n, o, p]
+        float a = col0_.x, e = col0_.y, i = col0_.z, m = col0_.w;
+        float b = col1_.x, f = col1_.y, j = col1_.z, n = col1_.w;
+        float c = col2_.x, g = col2_.y, k = col2_.z, o = col2_.w;
+        float d = col3_.x, h = col3_.y, l = col3_.z, p = col3_.w;
 
-        // Transpose to work with columns (easier for determinant calculations)
-        __m128 tmp0 = _mm_shuffle_ps(r0, r1, 0x44); // [a, b, e, f]
-        __m128 tmp1 = _mm_shuffle_ps(r0, r1, 0xEE); // [c, d, g, h]
-        __m128 tmp2 = _mm_shuffle_ps(r2, r3, 0x44); // [i, j, m, n]
-        __m128 tmp3 = _mm_shuffle_ps(r2, r3, 0xEE); // [k, l, o, p]
+        // Compute all 2x2 determinants
+        float kp_lo = k * p - l * o;
+        float jp_ln = j * p - l * n;
+        float jo_kn = j * o - k * n;
+        float ip_lm = i * p - l * m;
+        float io_km = i * o - k * m;
+        float in_jm = i * n - j * m;
 
-        __m128 c0 = _mm_shuffle_ps(tmp0, tmp2, 0x88); // [a, e, i, m] - col0
-        __m128 c1 = _mm_shuffle_ps(tmp0, tmp2, 0xDD); // [b, f, j, n] - col1
-        __m128 c2 = _mm_shuffle_ps(tmp1, tmp3, 0x88); // [c, g, k, o] - col2
-        __m128 c3 = _mm_shuffle_ps(tmp1, tmp3, 0xDD); // [d, h, l, p] - col3
+        float gp_ho = g * p - h * o;
+        float fp_hn = f * p - h * n;
+        float fo_gn = f * o - g * n;
+        float ep_hm = e * p - h * m;
+        float eo_gm = e * o - g * m;
+        float en_fm = e * n - f * m;
 
-        // Now we have columns in c0, c1, c2, c3
+        float gl_hk = g * l - h * k;
+        float fl_hj = f * l - h * j;
+        float fk_gj = f * k - g * j;
+        float el_hi = e * l - h * i;
+        float ek_gi = e * k - g * i;
+        float ej_fi = e * j - f * i;
 
-        // Compute all necessary 2x2 determinants using vectorized approach
-        // We'll compute determinants for pairs of columns
+        // Compute adjugate matrix elements
+        float m00 = (f * kp_lo - g * jp_ln + h * jo_kn);
+        float m10 = -(e * kp_lo - g * ip_lm + h * io_km);
+        float m20 = (e * jp_ln - f * ip_lm + h * in_jm);
+        float m30 = -(e * jo_kn - f * io_km + g * in_jm);
 
-        // det23_23 = c2[2]*c3[3] - c2[3]*c3[2] = k*p - l*o
-        // det23_13 = c1[2]*c3[3] - c1[3]*c3[2] = j*p - l*n
-        // etc...
+        float m01 = -(b * kp_lo - c * jp_ln + d * jo_kn);
+        float m11 = (a * kp_lo - c * ip_lm + d * io_km);
+        float m21 = -(a * jp_ln - b * ip_lm + d * in_jm);
+        float m31 = (a * jo_kn - b * io_km + c * in_jm);
 
-        // Create shuffled versions for determinant calculations
-        __m128 c2_zwzw = _mm_shuffle_ps(c2, c2, 0xBA); // [c2.z, c2.w, c2.z, c2.w] = [k, l, k, l]
-        __m128 c3_zwzw = _mm_shuffle_ps(c3, c3, 0xBA); // [c3.z, c3.w, c3.z, c3.w] = [o, p, o, p]
-        __m128 c1_zwzw = _mm_shuffle_ps(c1, c1, 0xBA); // [c1.z, c1.w, c1.z, c1.w] = [j, n, j, n]
-        __m128 c0_zwzw = _mm_shuffle_ps(c0, c0, 0xBA); // [c0.z, c0.w, c0.z, c0.w] = [i, m, i, m]
+        float m02 = (b * gp_ho - c * fp_hn + d * fo_gn);
+        float m12 = -(a * gp_ho - c * ep_hm + d * eo_gm);
+        float m22 = (a * fp_hn - b * ep_hm + d * en_fm);
+        float m32 = -(a * fo_gn - b * eo_gm + c * en_fm);
 
-        // Compute determinants for rows 2-3 (last two rows)
-        __m128 kp_lo = _mm_sub_ps(
-            _mm_mul_ps(_mm_shuffle_ps(c2_zwzw, c2_zwzw, 0xFF), _mm_shuffle_ps(c3_zwzw, c3_zwzw, 0xAA)), // k*p
-            _mm_mul_ps(_mm_shuffle_ps(c2_zwzw, c2_zwzw, 0xAA), _mm_shuffle_ps(c3_zwzw, c3_zwzw, 0xFF))  // l*o
-        );
-
-        // Extract to scalar for use in later computations
-        alignas(16) float dets[16];
-        _mm_store_ps(dets, kp_lo);
-
-        // For a complete SSE implementation, we would continue this pattern for all determinants
-        // However, the full adjugate computation is complex and may not benefit significantly
-        // from full SSE optimization in practice
-
-        // Given the complexity, here's a hybrid approach that uses SSE for the heavy computations
-        // but keeps the structure readable
-
-        // Convert columns back to rows for easier access
-        float4x4 transposed = this->transposed(); // Now we have columns as rows
-
-        float a = transposed.row0_.x, e = transposed.row0_.y, i = transposed.row0_.z, m = transposed.row0_.w;
-        float b = transposed.row1_.x, f = transposed.row1_.y, j = transposed.row1_.z, n = transposed.row1_.w;
-        float c = transposed.row2_.x, g = transposed.row2_.y, k = transposed.row2_.z, o = transposed.row2_.w;
-        float d = transposed.row3_.x, h = transposed.row3_.y, l = transposed.row3_.z, p = transposed.row3_.w;
-
-        // Use SSE for batch computation of 2x2 determinants
-        __m128 col2 = _mm_set_ps(d, c, b, a); // Not used directly
-        __m128 col3 = _mm_set_ps(h, g, f, e);
-
-        // Instead of trying to over-optimize, let's use a more maintainable SSE approach
-        // Compute all 2x2 determinants using vectorized operations where possible
-
-        // Vectorized computation of kp_lo, jp_ln, etc.
-        __m128 k_vec = _mm_set1_ps(k);
-        __m128 l_vec = _mm_set1_ps(l);
-        __m128 j_vec = _mm_set1_ps(j);
-        __m128 i_vec = _mm_set1_ps(i);
-
-        __m128 p_vec = _mm_set1_ps(p);
-        __m128 o_vec = _mm_set1_ps(o);
-        __m128 n_vec = _mm_set1_ps(n);
-        __m128 m_vec = _mm_set1_ps(m);
-
-        // Compute determinants in batches
-        __m128 kp = _mm_mul_ps(k_vec, p_vec);
-        __m128 lo = _mm_mul_ps(l_vec, o_vec);
-        float kp_lo_scalar = _mm_cvtss_f32(_mm_sub_ps(kp, lo));
-
-        __m128 jp = _mm_mul_ps(j_vec, p_vec);
-        __m128 ln = _mm_mul_ps(l_vec, n_vec);
-        float jp_ln_scalar = _mm_cvtss_f32(_mm_sub_ps(jp, ln));
-
-        __m128 jo = _mm_mul_ps(j_vec, o_vec);
-        __m128 kn = _mm_mul_ps(k_vec, n_vec);
-        float jo_kn_scalar = _mm_cvtss_f32(_mm_sub_ps(jo, kn));
-
-        __m128 ip = _mm_mul_ps(i_vec, p_vec);
-        __m128 lm = _mm_mul_ps(l_vec, m_vec);
-        float ip_lm_scalar = _mm_cvtss_f32(_mm_sub_ps(ip, lm));
-
-        __m128 io = _mm_mul_ps(i_vec, o_vec);
-        __m128 km = _mm_mul_ps(k_vec, m_vec);
-        float io_km_scalar = _mm_cvtss_f32(_mm_sub_ps(io, km));
-
-        __m128 in = _mm_mul_ps(i_vec, n_vec);
-        __m128 jm = _mm_mul_ps(j_vec, m_vec);
-        float in_jm_scalar = _mm_cvtss_f32(_mm_sub_ps(in, jm));
-
-        // Similar for other determinants...
-        __m128 g_vec = _mm_set1_ps(g);
-        __m128 h_vec = _mm_set1_ps(h);
-        __m128 f_vec = _mm_set1_ps(f);
-        __m128 e_vec = _mm_set1_ps(e);
-
-        __m128 gp = _mm_mul_ps(g_vec, p_vec);
-        __m128 ho = _mm_mul_ps(h_vec, o_vec);
-        float gp_ho_scalar = _mm_cvtss_f32(_mm_sub_ps(gp, ho));
-
-        __m128 fp = _mm_mul_ps(f_vec, p_vec);
-        __m128 hn = _mm_mul_ps(h_vec, n_vec);
-        float fp_hn_scalar = _mm_cvtss_f32(_mm_sub_ps(fp, hn));
-
-        __m128 fo = _mm_mul_ps(f_vec, o_vec);
-        __m128 gn = _mm_mul_ps(g_vec, n_vec);
-        float fo_gn_scalar = _mm_cvtss_f32(_mm_sub_ps(fo, gn));
-
-        __m128 ep = _mm_mul_ps(e_vec, p_vec);
-        __m128 hm = _mm_mul_ps(h_vec, m_vec);
-        float ep_hm_scalar = _mm_cvtss_f32(_mm_sub_ps(ep, hm));
-
-        __m128 eo = _mm_mul_ps(e_vec, o_vec);
-        __m128 gm = _mm_mul_ps(g_vec, m_vec);
-        float eo_gm_scalar = _mm_cvtss_f32(_mm_sub_ps(eo, gm));
-
-        __m128 en = _mm_mul_ps(e_vec, n_vec);
-        __m128 fm = _mm_mul_ps(f_vec, m_vec);
-        float en_fm_scalar = _mm_cvtss_f32(_mm_sub_ps(en, fm));
-
-        // And for gl_hk, etc.
-        __m128 gl = _mm_mul_ps(g_vec, l_vec);
-        __m128 hk = _mm_mul_ps(h_vec, k_vec);
-        float gl_hk_scalar = _mm_cvtss_f32(_mm_sub_ps(gl, hk));
-
-        __m128 fl = _mm_mul_ps(f_vec, l_vec);
-        __m128 hj = _mm_mul_ps(h_vec, j_vec);
-        float fl_hj_scalar = _mm_cvtss_f32(_mm_sub_ps(fl, hj));
-
-        __m128 fk = _mm_mul_ps(f_vec, k_vec);
-        __m128 gj = _mm_mul_ps(g_vec, j_vec);
-        float fk_gj_scalar = _mm_cvtss_f32(_mm_sub_ps(fk, gj));
-
-        __m128 el = _mm_mul_ps(e_vec, l_vec);
-        __m128 hi = _mm_mul_ps(h_vec, i_vec);
-        float el_hi_scalar = _mm_cvtss_f32(_mm_sub_ps(el, hi));
-
-        __m128 ek = _mm_mul_ps(e_vec, k_vec);
-        __m128 gi = _mm_mul_ps(g_vec, i_vec);
-        float ek_gi_scalar = _mm_cvtss_f32(_mm_sub_ps(ek, gi));
-
-        __m128 ej = _mm_mul_ps(e_vec, j_vec);
-        __m128 fi = _mm_mul_ps(f_vec, i_vec);
-        float ej_fi_scalar = _mm_cvtss_f32(_mm_sub_ps(ej, fi));
-
-        // Now compute the final matrix using SSE for the multiplications
-        __m128 b_vec = _mm_set1_ps(b);
-        __m128 c_vec = _mm_set1_ps(c);
-        __m128 d_vec = _mm_set1_ps(d);
-        __m128 a_vec = _mm_set1_ps(a);
-
-        // Compute row 0 using SSE
-        __m128 row0_part1 = _mm_mul_ps(f_vec, _mm_set1_ps(kp_lo_scalar));
-        __m128 row0_part2 = _mm_mul_ps(g_vec, _mm_set1_ps(jp_ln_scalar));
-        __m128 row0_part3 = _mm_mul_ps(h_vec, _mm_set1_ps(jo_kn_scalar));
-
-        __m128 m00_vec = _mm_add_ps(_mm_sub_ps(row0_part1, row0_part2), row0_part3);
-        float m00 = _mm_cvtss_f32(m00_vec);
-
-        // Continue with other elements similarly...
-        // For brevity, I'll show the pattern but not all 16 elements
-
-        // Compute all elements
-        float m01 = -_mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(e_vec, _mm_set1_ps(kp_lo_scalar)),
-                _mm_mul_ps(g_vec, _mm_set1_ps(ip_lm_scalar))),
-            _mm_mul_ps(h_vec, _mm_set1_ps(io_km_scalar))
-        ));
-
-        float m02 = _mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(e_vec, _mm_set1_ps(jp_ln_scalar)),
-                _mm_mul_ps(f_vec, _mm_set1_ps(ip_lm_scalar))),
-            _mm_mul_ps(h_vec, _mm_set1_ps(in_jm_scalar))
-        ));
-
-        float m03 = -_mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(e_vec, _mm_set1_ps(jo_kn_scalar)),
-                _mm_mul_ps(f_vec, _mm_set1_ps(io_km_scalar))),
-            _mm_mul_ps(g_vec, _mm_set1_ps(in_jm_scalar))
-        ));
-
-        // Row 1
-        float m10 = -_mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(b_vec, _mm_set1_ps(kp_lo_scalar)),
-                _mm_mul_ps(c_vec, _mm_set1_ps(jp_ln_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(jo_kn_scalar))
-        ));
-
-        float m11 = _mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(kp_lo_scalar)),
-                _mm_mul_ps(c_vec, _mm_set1_ps(ip_lm_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(io_km_scalar))
-        ));
-
-        float m12 = -_mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(jp_ln_scalar)),
-                _mm_mul_ps(b_vec, _mm_set1_ps(ip_lm_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(in_jm_scalar))
-        ));
-
-        float m13 = _mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(jo_kn_scalar)),
-                _mm_mul_ps(b_vec, _mm_set1_ps(io_km_scalar))),
-            _mm_mul_ps(c_vec, _mm_set1_ps(in_jm_scalar))
-        ));
-
-        // Row 2
-        float m20 = _mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(b_vec, _mm_set1_ps(gp_ho_scalar)),
-                _mm_mul_ps(c_vec, _mm_set1_ps(fp_hn_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(fo_gn_scalar))
-        ));
-
-        float m21 = -_mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(gp_ho_scalar)),
-                _mm_mul_ps(c_vec, _mm_set1_ps(ep_hm_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(eo_gm_scalar))
-        ));
-
-        float m22 = _mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(fp_hn_scalar)),
-                _mm_mul_ps(b_vec, _mm_set1_ps(ep_hm_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(en_fm_scalar))
-        ));
-
-        float m23 = -_mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(fo_gn_scalar)),
-                _mm_mul_ps(b_vec, _mm_set1_ps(eo_gm_scalar))),
-            _mm_mul_ps(c_vec, _mm_set1_ps(en_fm_scalar))
-        ));
-
-        // Row 3
-        float m30 = -_mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(b_vec, _mm_set1_ps(gl_hk_scalar)),
-                _mm_mul_ps(c_vec, _mm_set1_ps(fl_hj_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(fk_gj_scalar))
-        ));
-
-        float m31 = _mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(gl_hk_scalar)),
-                _mm_mul_ps(c_vec, _mm_set1_ps(el_hi_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(ek_gi_scalar))
-        ));
-
-        float m32 = -_mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(fl_hj_scalar)),
-                _mm_mul_ps(b_vec, _mm_set1_ps(el_hi_scalar))),
-            _mm_mul_ps(d_vec, _mm_set1_ps(ej_fi_scalar))
-        ));
-
-        float m33 = _mm_cvtss_f32(_mm_add_ps(
-            _mm_sub_ps(_mm_mul_ps(a_vec, _mm_set1_ps(fk_gj_scalar)),
-                _mm_mul_ps(b_vec, _mm_set1_ps(ek_gi_scalar))),
-            _mm_mul_ps(c_vec, _mm_set1_ps(ej_fi_scalar))
-        ));
+        float m03 = -(b * gl_hk - c * fl_hj + d * fk_gj);
+        float m13 = (a * gl_hk - c * el_hi + d * ek_gi);
+        float m23 = -(a * fl_hj - b * el_hi + d * ej_fi);
+        float m33 = (a * fk_gj - b * ek_gi + c * ej_fi);
 
         return float4x4(
-            m00, m01, m02, m03,
-            m10, m11, m12, m13,
-            m20, m21, m22, m23,
-            m30, m31, m32, m33
+            m00, m10, m20, m30,
+            m01, m11, m21, m31,
+            m02, m12, m22, m32,
+            m03, m13, m23, m33
         );
     }
 
     inline float3x3 float4x4::normal_matrix() const noexcept {
         float3x3 mat3x3(
-            float3(row0_.x, row0_.y, row0_.z),
-            float3(row1_.x, row1_.y, row1_.z),
-            float3(row2_.x, row2_.y, row2_.z)
+            float3(col0_.x, col0_.y, col0_.z),
+            float3(col1_.x, col1_.y, col1_.z),
+            float3(col2_.x, col2_.y, col2_.z)
         );
         return mat3x3.inverted().transposed();
     }
 
     inline float float4x4::trace() const noexcept {
-        return row0_.x + row1_.y + row2_.z + row3_.w;
+        return col0_.x + col1_.y + col2_.z + col3_.w;
     }
 
     inline float4 float4x4::diagonal() const noexcept {
-        return float4(row0_.x, row1_.y, row2_.z, row3_.w);
+        return float4(col0_.x, col1_.y, col2_.z, col3_.w);
     }
 
     inline float float4x4::frobenius_norm() const noexcept {
-        return std::sqrt(row0_.length_sq() + row1_.length_sq() + row2_.length_sq() + row3_.length_sq());
+        return std::sqrt(col0_.length_sq() + col1_.length_sq() + col2_.length_sq() + col3_.length_sq());
     }
 
     // ============================================================================
@@ -816,10 +589,10 @@ namespace Math
     // ============================================================================
 
     inline float4 float4x4::transform_vector(const float4& v) const noexcept {
-        __m128 r = _mm_mul_ps(_mm_set1_ps(v.x), row0_.get_simd());
-        r = _mm_add_ps(r, _mm_mul_ps(_mm_set1_ps(v.y), row1_.get_simd()));
-        r = _mm_add_ps(r, _mm_mul_ps(_mm_set1_ps(v.z), row2_.get_simd()));
-        r = _mm_add_ps(r, _mm_mul_ps(_mm_set1_ps(v.w), row3_.get_simd()));
+        __m128 r = _mm_mul_ps(col0_.get_simd(), _mm_set1_ps(v.x));
+        r = _mm_add_ps(r, _mm_mul_ps(col1_.get_simd(), _mm_set1_ps(v.y)));
+        r = _mm_add_ps(r, _mm_mul_ps(col2_.get_simd(), _mm_set1_ps(v.z)));
+        r = _mm_add_ps(r, _mm_mul_ps(col3_.get_simd(), _mm_set1_ps(v.w)));
         return float4(r);
     }
 
@@ -843,49 +616,65 @@ namespace Math
     // ============================================================================
 
     inline float3 float4x4::get_translation() const noexcept {
-        return float3(row3_.x, row3_.y, row3_.z);
+        return float3(col3_.x, col3_.y, col3_.z);
     }
 
     inline float3 float4x4::get_scale() const noexcept {
         return float3(
-            float3(row0_.x, row0_.y, row0_.z).length(),
-            float3(row1_.x, row1_.y, row1_.z).length(),
-            float3(row2_.x, row2_.y, row2_.z).length()
+            float3(col0_.x, col0_.y, col0_.z).length(),
+            float3(col1_.x, col1_.y, col1_.z).length(),
+            float3(col2_.x, col2_.y, col2_.z).length()
         );
     }
 
     inline quaternion float4x4::get_rotation() const noexcept {
-        float3 col0_norm = float3(row0_.x, row1_.x, row2_.x).normalize();
-        float3 col1_norm = float3(row0_.y, row1_.y, row2_.y).normalize();
-        float3 col2_norm = float3(row0_.z, row1_.z, row2_.z).normalize();
+        float3 col0_norm = float3(col0_.x, col0_.y, col0_.z).normalize();
+        float3 col1_norm = float3(col1_.x, col1_.y, col1_.z).normalize();
+        float3 col2_norm = float3(col2_.x, col2_.y, col2_.z).normalize();
 
         float3x3 rot_matrix(col0_norm, col1_norm, col2_norm);
         return quaternion::from_matrix(rot_matrix);
     }
 
     inline void float4x4::set_translation(const float3& t) noexcept {
-        row3_.x = t.x;
-        row3_.y = t.y;
-        row3_.z = t.z;
+        col3_.x = t.x;
+        col3_.y = t.y;
+        col3_.z = t.z;
     }
 
     inline void float4x4::set_scale(const float3& s) noexcept {
         const float3 current_scale = get_scale();
-        if (!current_scale.approximately_zero()) {
-            const float3 inv_current_scale = float3(1.0f) / current_scale;
+        const float eps = 1e-8f;
 
-            row0_.x *= inv_current_scale.x * s.x;
-            row0_.y *= inv_current_scale.y * s.y;
-            row0_.z *= inv_current_scale.z * s.z;
+        // Handle each axis separately
+        float3 c0 = float3(col0_.x, col0_.y, col0_.z);
+        float3 c1 = float3(col1_.x, col1_.y, col1_.z);
+        float3 c2 = float3(col2_.x, col2_.y, col2_.z);
 
-            row1_.x *= inv_current_scale.x * s.x;
-            row1_.y *= inv_current_scale.y * s.y;
-            row1_.z *= inv_current_scale.z * s.z;
-
-            row2_.x *= inv_current_scale.x * s.x;
-            row2_.y *= inv_current_scale.y * s.y;
-            row2_.z *= inv_current_scale.z * s.z;
+        if (c0.length_sq() > eps) {
+            c0 = c0.normalize() * s.x;
         }
+        else {
+            c0 = float3(s.x, 0.0f, 0.0f);
+        }
+
+        if (c1.length_sq() > eps) {
+            c1 = c1.normalize() * s.y;
+        }
+        else {
+            c1 = float3(0.0f, s.y, 0.0f);
+        }
+
+        if (c2.length_sq() > eps) {
+            c2 = c2.normalize() * s.z;
+        }
+        else {
+            c2 = float3(0.0f, 0.0f, s.z);
+        }
+
+        col0_.x = c0.x; col0_.y = c0.y; col0_.z = c0.z;
+        col1_.x = c1.x; col1_.y = c1.y; col1_.z = c1.z;
+        col2_.x = c2.x; col2_.y = c2.y; col2_.z = c2.z;
     }
 
     // ============================================================================
@@ -893,37 +682,37 @@ namespace Math
     // ============================================================================
 
     inline bool float4x4::is_identity(float epsilon) const noexcept {
-        return row0_.approximately(float4(1, 0, 0, 0), epsilon) &&
-            row1_.approximately(float4(0, 1, 0, 0), epsilon) &&
-            row2_.approximately(float4(0, 0, 1, 0), epsilon) &&
-            row3_.approximately(float4(0, 0, 0, 1), epsilon);
+        return col0_.approximately(float4(1, 0, 0, 0), epsilon) &&
+            col1_.approximately(float4(0, 1, 0, 0), epsilon) &&
+            col2_.approximately(float4(0, 0, 1, 0), epsilon) &&
+            col3_.approximately(float4(0, 0, 0, 1), epsilon);
     }
 
     inline bool float4x4::is_affine(float eps) const noexcept {
-        return std::abs(row3_.w - 1.0f) < eps &&
-            row0_.w < eps&&
-            row1_.w < eps&&
-            row2_.w < eps;
+        return std::abs(col3_.w - 1.0f) < eps &&
+            col0_.w < eps&&
+            col1_.w < eps&&
+            col2_.w < eps;
     }
 
     inline bool float4x4::is_orthogonal(float epsilon) const noexcept {
         if (!is_affine(epsilon)) return false;
 
-        const float3 row0_xyz = row0_.xyz();
-        const float3 row1_xyz = row1_.xyz();
-        const float3 row2_xyz = row2_.xyz();
+        const float3 col0_xyz = col0_.xyz();
+        const float3 col1_xyz = col1_.xyz();
+        const float3 col2_xyz = col2_.xyz();
 
-        float dot01 = std::abs(row0_xyz.dot(row1_xyz));
-        float dot02 = std::abs(row0_xyz.dot(row2_xyz));
-        float dot12 = std::abs(row1_xyz.dot(row2_xyz));
+        float dot01 = std::abs(col0_xyz.dot(col1_xyz));
+        float dot02 = std::abs(col0_xyz.dot(col2_xyz));
+        float dot12 = std::abs(col1_xyz.dot(col2_xyz));
 
         if (dot01 > epsilon || dot02 > epsilon || dot12 > epsilon) {
             return false;
         }
 
-        float len0 = row0_xyz.length_sq();
-        float len1 = row1_xyz.length_sq();
-        float len2 = row2_xyz.length_sq();
+        float len0 = col0_xyz.length_sq();
+        float len1 = col1_xyz.length_sq();
+        float len2 = col2_xyz.length_sq();
 
         return MathFunctions::approximately(len0, 1.0f, epsilon) &&
             MathFunctions::approximately(len1, 1.0f, epsilon) &&
@@ -931,10 +720,10 @@ namespace Math
     }
 
     inline bool float4x4::approximately(const float4x4& o, float e) const noexcept {
-        return row0_.approximately(o.row0_, e) &&
-            row1_.approximately(o.row1_, e) &&
-            row2_.approximately(o.row2_, e) &&
-            row3_.approximately(o.row3_, e);
+        return col0_.approximately(o.col0_, e) &&
+            col1_.approximately(o.col1_, e) &&
+            col2_.approximately(o.col2_, e) &&
+            col3_.approximately(o.col3_, e);
     }
 
     inline bool float4x4::approximately_zero(float e) const noexcept {
@@ -942,31 +731,31 @@ namespace Math
     }
 
     inline std::string float4x4::to_string() const {
-        char buf[256];
-        snprintf(buf, 256,
+        char buf[512];
+        snprintf(buf, sizeof(buf),
             "[%f %f %f %f]\n"
             "[%f %f %f %f]\n"
             "[%f %f %f %f]\n"
             "[%f %f %f %f]",
-            row0_.x, row0_.y, row0_.z, row0_.w,
-            row1_.x, row1_.y, row1_.z, row1_.w,
-            row2_.x, row2_.y, row2_.z, row2_.w,
-            row3_.x, row3_.y, row3_.z, row3_.w);
+            col0_.x, col1_.x, col2_.x, col3_.x,
+            col0_.y, col1_.y, col2_.y, col3_.y,
+            col0_.z, col1_.z, col2_.z, col3_.z,
+            col0_.w, col1_.w, col2_.w, col3_.w);
         return std::string(buf);
     }
 
     inline void float4x4::to_column_major(float* data) const noexcept {
-        data[0] = row0_.x; data[1] = row1_.x; data[2] = row2_.x; data[3] = row3_.x;
-        data[4] = row0_.y; data[5] = row1_.y; data[6] = row2_.y; data[7] = row3_.y;
-        data[8] = row0_.z; data[9] = row1_.z; data[10] = row2_.z; data[11] = row3_.z;
-        data[12] = row0_.w; data[13] = row1_.w; data[14] = row2_.w; data[15] = row3_.w;
+        data[0] = col0_.x; data[1] = col0_.y; data[2] = col0_.z; data[3] = col0_.w;
+        data[4] = col1_.x; data[5] = col1_.y; data[6] = col1_.z; data[7] = col1_.w;
+        data[8] = col2_.x; data[9] = col2_.y; data[10] = col2_.z; data[11] = col2_.w;
+        data[12] = col3_.x; data[13] = col3_.y; data[14] = col3_.z; data[15] = col3_.w;
     }
 
     inline void float4x4::to_row_major(float* data) const noexcept {
-        data[0] = row0_.x; data[1] = row0_.y; data[2] = row0_.z; data[3] = row0_.w;
-        data[4] = row1_.x; data[5] = row1_.y; data[6] = row1_.z; data[7] = row1_.w;
-        data[8] = row2_.x; data[9] = row2_.y; data[10] = row2_.z; data[11] = row2_.w;
-        data[12] = row3_.x; data[13] = row3_.y; data[14] = row3_.z; data[15] = row3_.w;
+        data[0] = col0_.x; data[1] = col1_.x; data[2] = col2_.x; data[3] = col3_.x;
+        data[4] = col0_.y; data[5] = col1_.y; data[6] = col2_.y; data[7] = col3_.y;
+        data[8] = col0_.z; data[9] = col1_.z; data[10] = col2_.z; data[11] = col3_.z;
+        data[12] = col0_.w; data[13] = col1_.w; data[14] = col2_.w; data[15] = col3_.w;
     }
 
     // ============================================================================
@@ -981,46 +770,38 @@ namespace Math
         return !(*this == rhs);
     }
 
-#if defined(MATH_SUPPORT_D3DX)
-    inline float4x4::operator D3DXMATRIX() const noexcept {
-        D3DXMATRIX result;
-        result._11 = row0_.x; result._12 = row0_.y; result._13 = row0_.z; result._14 = row0_.w;
-        result._21 = row1_.x; result._22 = row1_.y; result._23 = row1_.z; result._24 = row1_.w;
-        result._31 = row2_.x; result._32 = row2_.y; result._33 = row2_.z; result._34 = row2_.w;
-        result._41 = row3_.x; result._42 = row3_.y; result._43 = row3_.z; result._44 = row3_.w;
-        return result;
-    }
-#endif
-
     // ============================================================================
     // Binary Operators
     // ============================================================================
 
     /**
-     * @brief Matrix multiplication (SSE optimized for row-major)
+     * @brief Matrix multiplication (SSE optimized for column-major)
      */
     inline float4x4 operator*(const float4x4& lhs, const float4x4& rhs) noexcept {
         float4x4 res;
-        
-        const float4* lhsRows = &lhs.row0_;
-        float4* resRows = &res.row0_;
 
+        // Direct access to columns
+        const float4* rhs_cols = &rhs.col0_;
+        float4* res_cols = &res.col0_;
+
+        // For each column in result
         for (int i = 0; i < 4; ++i) {
-            __m128 l_row = lhsRows[i].get_simd();
+            // Load current column from rhs
+            __m128 col = rhs_cols[i].get_simd();
 
-            // Broadcast A components: xxxx, yyyy, zzzz, wwww
-            __m128 x = _mm_shuffle_ps(l_row, l_row, _MM_SHUFFLE(0, 0, 0, 0));
-            __m128 y = _mm_shuffle_ps(l_row, l_row, _MM_SHUFFLE(1, 1, 1, 1));
-            __m128 z = _mm_shuffle_ps(l_row, l_row, _MM_SHUFFLE(2, 2, 2, 2));
-            __m128 w = _mm_shuffle_ps(l_row, l_row, _MM_SHUFFLE(3, 3, 3, 3));
+            // Broadcast components
+            __m128 x = _mm_shuffle_ps(col, col, _MM_SHUFFLE(0, 0, 0, 0));
+            __m128 y = _mm_shuffle_ps(col, col, _MM_SHUFFLE(1, 1, 1, 1));
+            __m128 z = _mm_shuffle_ps(col, col, _MM_SHUFFLE(2, 2, 2, 2));
+            __m128 w = _mm_shuffle_ps(col, col, _MM_SHUFFLE(3, 3, 3, 3));
 
-            // Linear combination of RHS rows
-            __m128 r = _mm_mul_ps(x, rhs.row0_.get_simd());
-            r = _mm_add_ps(r, _mm_mul_ps(y, rhs.row1_.get_simd()));
-            r = _mm_add_ps(r, _mm_mul_ps(z, rhs.row2_.get_simd()));
-            r = _mm_add_ps(r, _mm_mul_ps(w, rhs.row3_.get_simd()));
+            // Linear combination of LHS columns
+            __m128 r = _mm_mul_ps(lhs.col0_.get_simd(), x);
+            r = _mm_add_ps(r, _mm_mul_ps(lhs.col1_.get_simd(), y));
+            r = _mm_add_ps(r, _mm_mul_ps(lhs.col2_.get_simd(), z));
+            r = _mm_add_ps(r, _mm_mul_ps(lhs.col3_.get_simd(), w));
 
-            resRows[i].set_simd(r);
+            res_cols[i].set_simd(r);
         }
         return res;
     }
