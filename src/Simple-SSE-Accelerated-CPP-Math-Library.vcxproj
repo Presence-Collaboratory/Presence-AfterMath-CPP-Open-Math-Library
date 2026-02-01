@@ -158,8 +158,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Demo\autotests.h" />
-    <ClInclude Include="Demo\benchmark.h" />
+    <ClInclude Include="Autotests\AutotestCore.h" />
+    <ClInclude Include="Autotests\autotests_float3x3.h" />
+    <ClInclude Include="Autotests\autotests_float4x4.h" />
     <ClInclude Include="MathAPI\MathAPI.h" />
     <ClInclude Include="MathAPI\math_config.h" />
     <ClInclude Include="MathAPI\math_constants.h" />

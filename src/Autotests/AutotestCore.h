@@ -67,6 +67,33 @@ namespace MathTests
         }
     };
 
+    // Helper function for safe approximately comparison
+    template<typename T>
+    bool safe_approximately(const T& a, const T& b, float epsilon)
+    {
+        // For arithmetic types
+        if constexpr (std::is_arithmetic_v<T>) {
+            if (std::isinf(a) && std::isinf(b)) {
+                return std::signbit(a) == std::signbit(b);
+            }
+            if (std::isnan(a) && std::isnan(b)) {
+                return true;
+            }
+            if (std::isinf(a) || std::isinf(b) || std::isnan(a) || std::isnan(b)) {
+                return false;
+            }
+            return std::abs(a - b) <= epsilon;
+        }
+        // For vector/matrix types with approximately method
+        else if constexpr (requires { a.approximately(b, epsilon); }) {
+            return a.approximately(b, epsilon);
+        }
+        // For other types (should have operator==)
+        else {
+            return a == b;
+        }
+    }
+
     class TestSuite
     {
     private:
@@ -88,142 +115,16 @@ namespace MathTests
 
         std::vector<TestResult> test_results;
 
-        // Helper function for safe infinity comparison
-        template<typename T>
-        bool safe_approximately(const T& a, const T& b, float epsilon)
-        {
-            // For vector types with component-wise infinity checks
-            if constexpr (requires { a.x; b.x; }) {
-                // For vector types, check if any component is infinity
-                bool a_has_inf = false, b_has_inf = false;
-                bool a_has_nan = false, b_has_nan = false;
-
-                // Check each component for special values
-                for (int i = 0; i < sizeof(a) / sizeof(a.x); ++i) {
-                    if (std::isinf(a[i])) a_has_inf = true;
-                    if (std::isinf(b[i])) b_has_inf = true;
-                    if (std::isnan(a[i])) a_has_nan = true;
-                    if (std::isnan(b[i])) b_has_nan = true;
-                }
-
-                if (a_has_inf && b_has_inf) {
-                    // For vectors with infinity, check if they're approximately equal
-                    // This means all non-infinity components should be equal
-                    for (int i = 0; i < sizeof(a) / sizeof(a.x); ++i) {
-                        if (!std::isinf(a[i]) && !std::isinf(b[i]) &&
-                            !approximately(a[i], b[i], epsilon)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-
-                if (a_has_nan && b_has_nan) return true;
-            }
-            // For arithmetic types and half (existing logic)
-            else if constexpr (std::is_arithmetic_v<T>) {
-                if (std::isinf(a) && std::isinf(b)) {
-                    return std::signbit(a) == std::signbit(b);
-                }
-                if (std::isnan(a) && std::isnan(b)) {
-                    return true;
-                }
-            }
-
-            return approximately(a, b, epsilon);
-        }
-
-        // Specialized function for half type only
-        bool safe_approximately_half(const half& a, const half& b, float epsilon)
-        {
-            // Handle infinity cases for half
-            if (a.is_inf() && b.is_inf()) {
-                return a.is_negative() == b.is_negative();
-            }
-            if (a.is_nan() && b.is_nan()) {
-                return true; // Consider all NaNs equal for test purposes
-            }
-
-            // Handle mismatched special cases
-            if ((a.is_inf() && !b.is_inf()) || (!a.is_inf() && b.is_inf()) ||
-                (a.is_nan() && !b.is_nan()) || (!a.is_nan() && b.is_nan())) {
-                return false;
-            }
-
-            // Use library's approximately function for normal cases
-            return approximately(a, b, epsilon);
-        }
-
-        bool safe_approximately_half2(const half2& a, const half2& b, float epsilon)
-        {
-            // Handle infinity cases for half
-            if (a.is_inf() && b.is_inf()) {
-                return a.is_negative() == b.is_negative();
-            }
-            if (a.is_nan() && b.is_nan()) {
-                return true; // Consider all NaNs equal for test purposes
-            }
-
-            // Handle mismatched special cases
-            if ((a.is_inf() && !b.is_inf()) || (!a.is_inf() && b.is_inf()) ||
-                (a.is_nan() && !b.is_nan()) || (!a.is_nan() && b.is_nan())) {
-                return false;
-            }
-
-            // Use library's approximately function for normal cases
-            return approximately(a, b, epsilon);
-        }
-
-        // Добавить специализированную функцию для half3:
-        bool safe_approximately_half3(const half3& a, const half3& b, float epsilon)
-        {
-            // Handle infinity cases for half3
-            if (a.is_inf() && b.is_inf()) {
-                return a.is_negative() == b.is_negative();
-            }
-            if (a.is_nan() && b.is_nan()) {
-                return true; // Consider all NaNs equal for test purposes
-            }
-
-            // Handle mismatched special cases
-            if ((a.is_inf() && !b.is_inf()) || (!a.is_inf() && b.is_inf()) ||
-                (a.is_nan() && !b.is_nan()) || (!a.is_nan() && b.is_nan())) {
-                return false;
-            }
-
-            // Use library's approximately function for normal cases
-            return approximately(a, b, epsilon);
-        }
-
-        bool safe_approximately_half4(const half4& a, const half4& b, float epsilon)
-        {
-            // Handle infinity cases for half3
-            if (a.is_inf() && b.is_inf()) {
-                return a.is_negative() == b.is_negative();
-            }
-            if (a.is_nan() && b.is_nan()) {
-                return true; // Consider all NaNs equal for test purposes
-            }
-
-            // Handle mismatched special cases
-            if ((a.is_inf() && !b.is_inf()) || (!a.is_inf() && b.is_inf()) ||
-                (a.is_nan() && !b.is_nan()) || (!a.is_nan() && b.is_nan())) {
-                return false;
-            }
-
-            // Use library's approximately function for normal cases
-            return approximately(a, b, epsilon);
-        } 
-        
-        bool safe_approximately_quaternion(const quaternion& a, const quaternion& b, float epsilon)
-        {
-            return approximately(a, b, epsilon);
-        }
-
     public:
         TestSuite(const std::string& name, bool verb = TestConfig::VERBOSE_OUTPUT)
             : suite_name(name), tests_passed(0), tests_failed(0), tests_skipped(0),
             verbose(verb), reporter() {}
+
+        // Section management
+        void section(const std::string& title)
+        {
+            reporter.section(title);
+        }
 
         // Test lifecycle management
         void start_test(const std::string& test_name)
@@ -322,130 +223,12 @@ namespace MathTests
             return success;
         }
 
-        bool assert_equal_half_t(const half& actual, const half& expected, const std::string& test_name,
+        // Alias for assert_equal with more descriptive name for floating-point comparisons
+        template<typename T>
+        bool assert_approximately_equal(const T& actual, const T& expected, const std::string& test_name,
             float epsilon = TestConfig::DEFAULT_EPSILON)
         {
-            start_test(test_name);
-
-            bool success = safe_approximately_half(actual, expected, epsilon);
-            std::string message;
-
-            if (!success)
-            {
-                message = "Expected: " + format_value(expected) +
-                    ", Got: " + format_value(actual) +
-                    ", Epsilon: " + std::to_string(epsilon);
-            }
-
-            end_test(test_name, success, message);
-            return success;
-        }
-
-        bool assert_equal_half2_t(const half2& actual, const half2& expected, const std::string& test_name,
-            float epsilon = TestConfig::DEFAULT_EPSILON)
-        {
-            start_test(test_name);
-
-            bool success = safe_approximately_half2(actual, expected, epsilon);
-            std::string message;
-
-            if (!success)
-            {
-                message = "Expected: " + format_value(expected) +
-                    ", Got: " + format_value(actual) +
-                    ", Epsilon: " + std::to_string(epsilon);
-            }
-
-            end_test(test_name, success, message);
-            return success;
-        }
-
-        bool assert_equal_half3_t(const half3& actual, const half3& expected, const std::string& test_name,
-            float epsilon = TestConfig::DEFAULT_EPSILON)
-        {
-            start_test(test_name);
-
-            bool success = safe_approximately_half3(actual, expected, epsilon);
-            std::string message;
-
-            if (!success)
-            {
-                message = "Expected: " + format_value(expected) +
-                    ", Got: " + format_value(actual) +
-                    ", Epsilon: " + std::to_string(epsilon);
-            }
-
-            end_test(test_name, success, message);
-            return success;
-        }
-
-        bool assert_equal_half4_t(const half4& actual, const half4& expected, const std::string& test_name,
-            float epsilon = TestConfig::DEFAULT_EPSILON)
-        {
-            start_test(test_name);
-
-            bool success = safe_approximately_half4(actual, expected, epsilon);
-            std::string message;
-
-            if (!success)
-            {
-                message = "Expected: " + format_value(expected) +
-                    ", Got: " + format_value(actual) +
-                    ", Epsilon: " + std::to_string(epsilon);
-            }
-
-            end_test(test_name, success, message);
-            return success;
-        }
-
-        bool assert_equal_quaternion(const quaternion& actual, const quaternion& expected, const std::string& test_name,
-            float epsilon = TestConfig::DEFAULT_EPSILON)
-        {
-            start_test(test_name);
-
-            // Для тестов на равенство компонентов нужно сравнивать компоненты напрямую,
-            // а не через approximately (который учитывает двойное покрытие)
-            bool success = safe_approximately_quaternion_components(actual, expected, epsilon);
-            std::string message;
-
-            if (!success)
-            {
-                message = "Expected: " + format_value(expected) +
-                    ", Got: " + format_value(actual) +
-                    ", Epsilon: " + std::to_string(epsilon);
-            }
-
-            end_test(test_name, success, message);
-            return success;
-        }
-
-        bool safe_approximately_quaternion_components(const quaternion& a, const quaternion& b, float epsilon)
-        {
-            // Сравниваем компоненты напрямую, а не через двойное покрытие
-            return MathFunctions::approximately(a.x, b.x, epsilon) &&
-                MathFunctions::approximately(a.y, b.y, epsilon) &&
-                MathFunctions::approximately(a.z, b.z, epsilon) &&
-                MathFunctions::approximately(a.w, b.w, epsilon);
-        }
-
-        // Дополнительная функция для тестирования вращений (учитывает двойное покрытие)
-        bool assert_approximately_quaternion_rotation(const quaternion& actual, const quaternion& expected,
-            const std::string& test_name, float epsilon = TestConfig::DEFAULT_EPSILON)
-        {
-            start_test(test_name);
-
-            bool success = approximately(actual, expected, epsilon); // использует двойное покрытие
-            std::string message;
-
-            if (!success)
-            {
-                message = "Expected rotation: " + format_value(expected) +
-                    ", Got: " + format_value(actual) +
-                    ", Epsilon: " + std::to_string(epsilon);
-            }
-
-            end_test(test_name, success, message);
-            return success;
+            return assert_equal(actual, expected, test_name, epsilon);
         }
 
         template<typename T>

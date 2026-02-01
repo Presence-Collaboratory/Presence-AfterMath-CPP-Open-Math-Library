@@ -28,8 +28,14 @@
     <Filter Include="Math\Implementation\Data types\Quaternion">
       <UniqueIdentifier>{c13195ca-684e-48fb-a683-0ce93be3b917}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Demo">
-      <UniqueIdentifier>{bd5d46af-86f7-4b76-a6c8-2c4c317e976c}</UniqueIdentifier>
+    <Filter Include="Autotests">
+      <UniqueIdentifier>{5b19ba39-4e89-4c7e-a52a-b2a7f3914abd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Autotests\Types">
+      <UniqueIdentifier>{23450b1d-6f52-4c0c-a593-4ae76a1a4c85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Autotests\Types\Matrices">
+      <UniqueIdentifier>{4d148389-c505-41b6-87b8-a6c1421e2506}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -81,11 +87,14 @@
     <ClInclude Include="MathAPI\math_float2x2.h">
       <Filter>Math\Implementation\Data types\Matrices</Filter>
     </ClInclude>
-    <ClInclude Include="Demo\benchmark.h">
-      <Filter>Demo</Filter>
+    <ClInclude Include="Autotests\AutotestCore.h">
+      <Filter>Autotests</Filter>
     </ClInclude>
-    <ClInclude Include="Demo\autotests.h">
-      <Filter>Demo</Filter>
+    <ClInclude Include="Autotests\autotests_float3x3.h">
+      <Filter>Autotests\Types\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="Autotests\autotests_float4x4.h">
+      <Filter>Autotests\Types\Matrices</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
