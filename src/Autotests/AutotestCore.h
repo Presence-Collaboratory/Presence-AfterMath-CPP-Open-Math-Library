@@ -67,28 +67,64 @@ namespace MathTests
         }
     };
 
+    template<typename T>
+    bool isinf(T value) noexcept
+    {
+        // Только для плавающих типов
+        if constexpr (std::is_floating_point_v<T>)
+            return std::isinf(value);
+        else
+            return false; // Целые числа не могут быть бесконечными
+    }
+
+    template<typename T>
+    bool isnan(T value) noexcept
+    {
+        if constexpr (std::is_floating_point_v<T>)
+            return std::isnan(value);
+        else
+            return false; // Целые числа не могут быть NaN
+    }
+
+    template<typename T>
+    bool isfinite(T value) noexcept
+    {
+        if constexpr (std::is_floating_point_v<T>)
+            return std::isfinite(value);
+        else
+            return true; // Целые числа всегда конечны
+    }
+
     // Helper function for safe approximately comparison
     template<typename T>
     bool safe_approximately(const T& a, const T& b, float epsilon)
     {
-        // For arithmetic types
+        // Для арифметических типов
         if constexpr (std::is_arithmetic_v<T>) {
-            if (std::isinf(a) && std::isinf(b)) {
-                return std::signbit(a) == std::signbit(b);
+            // Для целочисленных типов используем простое сравнение
+            if constexpr (std::is_integral_v<T>) {
+                return a == b;
             }
-            if (std::isnan(a) && std::isnan(b)) {
-                return true;
+            else {
+                // Для плавающих типов используем signbit и другие проверки
+                if (isinf(a) && isinf(b)) {
+                    // signbit требует плавающий тип, приводим к float
+                    return std::signbit(static_cast<float>(a)) == std::signbit(static_cast<float>(b));
+                }
+                if (isnan(a) && isnan(b)) {
+                    return true;
+                }
+                if (isinf(a) || isinf(b) || isnan(a) || isnan(b)) {
+                    return false;
+                }
+                return std::abs(a - b) <= epsilon;
             }
-            if (std::isinf(a) || std::isinf(b) || std::isnan(a) || std::isnan(b)) {
-                return false;
-            }
-            return std::abs(a - b) <= epsilon;
         }
-        // For vector/matrix types with approximately method
+        // Для векторных/матричных типов с approximately методом
         else if constexpr (requires { a.approximately(b, epsilon); }) {
             return a.approximately(b, epsilon);
         }
-        // For other types (should have operator==)
+        // Для других типов (должны иметь operator==)
         else {
             return a == b;
         }
@@ -177,10 +213,10 @@ namespace MathTests
 
             if constexpr (std::is_arithmetic_v<T>)
             {
-                if (std::isinf(value)) {
+                if (isinf(value)) {
                     oss << (value < 0 ? "-inf" : "inf");
                 }
-                else if (std::isnan(value)) {
+                else if (isnan(value)) {
                     oss << "nan";
                 }
                 else {

@@ -487,7 +487,7 @@ namespace MathTests
             float3x3 mat(1, 0, 0,
                 0, 2, 0,
                 0, 0, 3);
-            float expectedNorm = std::sqrt(1 * 1 + 2 * 2 + 3 * 3);
+            float expectedNorm = std::sqrt(1.0f * 1.0f + 2.0f * 2.0f + 3.0f * 3.0f);
             suite.assert_approximately_equal(mat.frobenius_norm(), expectedNorm, "frobenius_norm");
 
             // Проверка свободной функции

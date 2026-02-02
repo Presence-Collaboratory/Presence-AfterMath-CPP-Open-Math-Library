@@ -599,6 +599,82 @@ namespace Math
 
         bool operator==(const float3& rhs) const noexcept;
         bool operator!=(const float3& rhs) const noexcept;
+
+        // ============================================================================
+        // Component Operations Implementation
+        // ============================================================================
+
+        /**
+        * @brief Get the minimum component of the vector
+        * @return Minimum value among x, y, z
+        */
+        float min_component() const noexcept;
+
+        /**
+         * @brief Get the maximum component of the vector
+         * @return Maximum value among x, y, z
+         */
+        float max_component() const noexcept;
+
+        /**
+         * @brief Get the index of the minimum component
+         * @return Index of minimum component (0=x, 1=y, 2=z)
+         */
+        int min_component_index() const noexcept;
+
+        /**
+         * @brief Get the index of the maximum component
+         * @return Index of maximum component (0=x, 1=y, 2=z)
+         */
+        int max_component_index() const noexcept;
+
+        /**
+         * @brief Get sum of all components
+         * @return x + y + z
+         */
+        float sum_components() const noexcept;
+
+        /**
+         * @brief Get product of all components
+         * @return x * y * z
+         */
+        float product_components() const noexcept;
+
+        /**
+ * @brief Compute average of components
+ * @return (x + y + z) / 3
+ */
+        float average() const noexcept
+        {
+            return sum_components() / 3.0f;
+        }
+
+        /**
+         * @brief Check if any component is NaN
+         * @return True if any component is NaN
+         */
+        bool has_nan() const noexcept
+        {
+            return std::isnan(x) || std::isnan(y) || std::isnan(z);
+        }
+
+        /**
+         * @brief Check if any component is infinite
+         * @return True if any component is infinite
+         */
+        bool has_infinite() const noexcept
+        {
+            return std::isinf(x) || std::isinf(y) || std::isinf(z);
+        }
+
+        /**
+         * @brief Check if all components are finite
+         * @return True if all components are finite
+         */
+        bool all_finite() const noexcept
+        {
+            return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
+        }
     };
 
     // ============================================================================
@@ -612,6 +688,7 @@ namespace Math
     inline float3 operator*(float3 vec, float scalar) noexcept;
     inline float3 operator*(float scalar, float3 vec) noexcept;
     inline float3 operator/(float3 vec, float scalar) noexcept;
+    inline float3 operator/(float scalar, float3 vec) noexcept;
 
     // ============================================================================
     // Global Mathematical Functions

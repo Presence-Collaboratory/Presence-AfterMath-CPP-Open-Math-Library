@@ -159,10 +159,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Autotests\AutotestCore.h" />
+    <ClInclude Include="Autotests\autotests_aabb.h" />
     <ClInclude Include="Autotests\autotests_float3x3.h" />
     <ClInclude Include="Autotests\autotests_float4x4.h" />
     <ClInclude Include="Autotests\autotests_quaternion.h" />
     <ClInclude Include="MathAPI\MathAPI.h" />
+    <ClInclude Include="MathAPI\math_aabb.h" />
     <ClInclude Include="MathAPI\math_config.h" />
     <ClInclude Include="MathAPI\math_constants.h" />
     <ClInclude Include="MathAPI\math_fast_functions.h" />
@@ -180,6 +182,7 @@
     <ClInclude Include="MathAPI\math_quaternion.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="MathAPI\math_aabb.inl" />
     <None Include="MathAPI\math_float2.inl" />
     <None Include="MathAPI\math_float2x2.inl" />
     <None Include="MathAPI\math_float3.inl" />

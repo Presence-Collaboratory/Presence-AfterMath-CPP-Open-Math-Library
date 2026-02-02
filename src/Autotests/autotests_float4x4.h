@@ -648,7 +648,7 @@ namespace MathTests
         // Норма Фробениуса
         {
             float4x4 mat = float4x4::scaling(2, 3, 4);
-            float expectedNorm = std::sqrt(2 * 2 + 3 * 3 + 4 * 4 + 1 * 1); // Диагональные элементы: 2,3,4,1
+            float expectedNorm = std::sqrt(2.0f * 2.0f + 3.0f * 3.0f + 4.0f * 4.0f + 1.0f * 1.0f); // Диагональные элементы: 2,3,4,1
             suite.assert_approximately_equal(mat.frobenius_norm(), expectedNorm, "frobenius_norm", 1e-5f);
         }
 

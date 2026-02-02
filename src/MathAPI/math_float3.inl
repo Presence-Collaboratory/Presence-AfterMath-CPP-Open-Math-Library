@@ -452,6 +452,64 @@ namespace Math
     }
 
     // ============================================================================
+    // Component Operations Implementation
+    // ============================================================================
+
+    inline float float3::min_component() const noexcept
+    {
+        __m128 v = get_simd();
+        // Horizontal minimum across x, y, z
+        __m128 temp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 2, 1)); // (y, z, 0, x)
+        __m128 min1 = _mm_min_ps(v, temp);
+        __m128 min2 = _mm_shuffle_ps(min1, min1, _MM_SHUFFLE(0, 0, 0, 2));
+        __m128 min_result = _mm_min_ps(min1, min2);
+        return _mm_cvtss_f32(min_result);
+    }
+
+    inline float float3::max_component() const noexcept
+    {
+        __m128 v = get_simd();
+        // Horizontal maximum across x, y, z
+        __m128 temp = _mm_shuffle_ps(v, v, _MM_SHUFFLE(0, 0, 2, 1)); // (y, z, 0, x)
+        __m128 max1 = _mm_max_ps(v, temp);
+        __m128 max2 = _mm_shuffle_ps(max1, max1, _MM_SHUFFLE(0, 0, 0, 2));
+        __m128 max_result = _mm_max_ps(max1, max2);
+        return _mm_cvtss_f32(max_result);
+    }
+
+    inline int float3::min_component_index() const noexcept
+    {
+        // Simple scalar version for clarity
+        if (x <= y && x <= z) return 0;
+        if (y <= z) return 1;
+        return 2;
+    }
+
+    inline int float3::max_component_index() const noexcept
+    {
+        // Simple scalar version for clarity
+        if (x >= y && x >= z) return 0;
+        if (y >= z) return 1;
+        return 2;
+    }
+
+    inline float float3::sum_components() const noexcept
+    {
+        __m128 v = get_simd();
+        // Horizontal sum of x, y, z
+        __m128 shuf = _mm_movehdup_ps(v);        // (y, y, w, w)
+        __m128 sums = _mm_add_ps(v, shuf);       // x+y, y+y, z+w, w+w
+        shuf = _mm_movehl_ps(shuf, sums);        // (z+w, w+w, y, y)
+        sums = _mm_add_ss(sums, shuf);           // x+y+z+w
+        return _mm_cvtss_f32(sums) - _mm_cvtss_f32(_mm_shuffle_ps(v, v, _MM_SHUFFLE(3, 3, 3, 3)));
+    }
+
+    inline float float3::product_components() const noexcept
+    {
+        return x * y * z;
+    }
+
+    // ============================================================================
     // Global Operators Implementation
     // ============================================================================
 
@@ -462,6 +520,7 @@ namespace Math
     inline float3 operator*(float3 vec, float scalar) noexcept { return vec *= scalar; }
     inline float3 operator*(float scalar, float3 vec) noexcept { return vec *= scalar; }
     inline float3 operator/(float3 vec, float scalar) noexcept { return vec /= scalar; }
+    inline float3 operator/(float scalar, float3 vec) noexcept { return float3(scalar / vec.x, scalar / vec.y, scalar / vec.z); }
 
     // ============================================================================
     // Global Functions Implementation
@@ -518,6 +577,35 @@ namespace Math
         if (dot_val > 1.0f) dot_val = 1.0f;
         if (dot_val < -1.0f) dot_val = -1.0f;
         return std::acos(dot_val);
+    }
+
+    // ============================================================================
+    // Global Component Operations
+    // ============================================================================
+
+    inline float min_component(const float3& v) noexcept
+    {
+        return v.min_component();
+    }
+
+    inline float max_component(const float3& v) noexcept
+    {
+        return v.max_component();
+    }
+
+    inline float sum_components(const float3& v) noexcept
+    {
+        return v.sum_components();
+    }
+
+    inline float product_components(const float3& v) noexcept
+    {
+        return v.product_components();
+    }
+
+    inline float average(const float3& v) noexcept
+    {
+        return v.sum_components() / 3.0f;
     }
 
     // ============================================================================
