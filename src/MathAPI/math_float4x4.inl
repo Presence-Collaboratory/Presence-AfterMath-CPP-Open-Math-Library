@@ -67,9 +67,11 @@ namespace Math
         float wy = q.w * q.y;
         float wz = q.w * q.z;
 
-        row0_ = float4(1.0f - 2.0f * (yy + zz), 2.0f * (xy - wz), 2.0f * (xz + wy), 0.0f);
-        row1_ = float4(2.0f * (xy + wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz - wx), 0.0f);
-        row2_ = float4(2.0f * (xz - wy), 2.0f * (yz + wx), 1.0f - 2.0f * (xx + yy), 0.0f);
+        // LH Conversion matching quaternion::to_matrix3x3 and float4x4::rotation_y
+        // Upper triangle W subtracted, Lower triangle W added
+        row0_ = float4(1.0f - 2.0f * (yy + zz), 2.0f * (xy + wz), 2.0f * (xz - wy), 0.0f);
+        row1_ = float4(2.0f * (xy - wz), 1.0f - 2.0f * (xx + zz), 2.0f * (yz + wx), 0.0f);
+        row2_ = float4(2.0f * (xz + wy), 2.0f * (yz - wx), 1.0f - 2.0f * (xx + yy), 0.0f);
         row3_ = float4(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
@@ -105,10 +107,11 @@ namespace Math
     inline float4x4 float4x4::rotation_y(float angle) noexcept {
         float s, c;
         MathFunctions::sin_cos(angle, &s, &c);
+        // LH Rotation Y: [c 0 -s]
         return float4x4(
-            c, 0, s, 0,
+            c, 0, -s, 0,
             0, 1, 0, 0,
-            -s, 0, c, 0,
+            s, 0, c, 0,
             0, 0, 0, 1
         );
     }
@@ -163,7 +166,7 @@ namespace Math
             w, 0, 0, 0,
             0, h, 0, 0,
             0, 0, zf * range_inv, -1,
-            0, 0, zn * zf * range_inv, 0
+            0, 0, -zn * zf * range_inv, 0
         );
     }
 
@@ -375,12 +378,10 @@ namespace Math
 
     inline float4x4 float4x4::inverted() const noexcept
     {
-        // Оптимизация для аффинных матриц
         if (is_affine()) {
             return inverted_affine();
         }
 
-        // Общий случай через присоединенную матрицу
         float det = determinant();
         if (std::abs(det) < Constants::Constants<float>::Epsilon) {
             return identity();
@@ -505,15 +506,18 @@ namespace Math
         float inv_scale_y = (std::abs(scale.y) > epsilon) ? (1.0f / scale.y) : 0.0f;
         float inv_scale_z = (std::abs(scale.z) > epsilon) ? (1.0f / scale.z) : 0.0f;
 
-        float3 r0 = float3(row0_.x * inv_scale_x, row0_.y * inv_scale_y, row0_.z * inv_scale_z);
-        float3 r1 = float3(row1_.x * inv_scale_x, row1_.y * inv_scale_y, row1_.z * inv_scale_z);
-        float3 r2 = float3(row2_.x * inv_scale_x, row2_.y * inv_scale_y, row2_.z * inv_scale_z);
+        // Correctly apply inverse scale to each ROW (which represents a basis vector in Row-Major)
+        // Previous error was applying components of scale to components of rows
+        float3 r0 = float3(row0_.x * inv_scale_x, row0_.y * inv_scale_x, row0_.z * inv_scale_x);
+        float3 r1 = float3(row1_.x * inv_scale_y, row1_.y * inv_scale_y, row1_.z * inv_scale_y);
+        float3 r2 = float3(row2_.x * inv_scale_z, row2_.y * inv_scale_z, row2_.z * inv_scale_z);
 
         float3x3 rot_matrix(r0, r1, r2);
 
         rot_matrix = rot_matrix.extract_rotation();
 
-        return quaternion::from_matrix(rot_matrix);
+        // Transpose because quaternion::from_matrix expects column vectors
+        return quaternion::from_matrix(rot_matrix.transposed());
     }
 
     inline void float4x4::set_translation(const float3& t) noexcept {
@@ -523,31 +527,17 @@ namespace Math
     }
 
     inline void float4x4::set_scale(const float3& scale) noexcept {
-        float3 x_axis = float3(row0_.x, row1_.x, row2_.x);
-        float3 y_axis = float3(row0_.y, row1_.y, row2_.y);
-        float3 z_axis = float3(row0_.z, row1_.z, row2_.z);
+        float3 x_axis = row0_.xyz().normalize();
+        float3 y_axis = row1_.xyz().normalize();
+        float3 z_axis = row2_.xyz().normalize();
 
-        float len_x = x_axis.length();
-        float len_y = y_axis.length();
-        float len_z = z_axis.length();
+        x_axis *= scale.x;
+        y_axis *= scale.y;
+        z_axis *= scale.z;
 
-        if (len_x > Constants::Constants<float>::Epsilon) {
-            x_axis = x_axis * (1.0f / len_x);
-        }
-        if (len_y > Constants::Constants<float>::Epsilon) {
-            y_axis = y_axis * (1.0f / len_y);
-        }
-        if (len_z > Constants::Constants<float>::Epsilon) {
-            z_axis = z_axis * (1.0f / len_z);
-        }
-
-        x_axis = x_axis * scale.x;
-        y_axis = y_axis * scale.y;
-        z_axis = z_axis * scale.z;
-
-        row0_.x = x_axis.x; row1_.x = x_axis.y; row2_.x = x_axis.z;
-        row0_.y = y_axis.x; row1_.y = y_axis.y; row2_.y = y_axis.z;
-        row0_.z = z_axis.x; row1_.z = z_axis.y; row2_.z = z_axis.z;
+        row0_ = float4(x_axis, row0_.w);
+        row1_ = float4(y_axis, row1_.w);
+        row2_ = float4(z_axis, row2_.w);
     }
 
     inline bool float4x4::is_identity(float epsilon) const noexcept {

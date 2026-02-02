@@ -96,6 +96,9 @@
     <ClInclude Include="Autotests\autotests_float4x4.h">
       <Filter>Autotests\Types\Matrices</Filter>
     </ClInclude>
+    <ClInclude Include="Autotests\autotests_quaternion.h">
+      <Filter>Autotests\Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="MathAPI\math_float2.inl">

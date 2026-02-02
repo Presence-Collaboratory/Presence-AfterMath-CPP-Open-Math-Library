@@ -867,7 +867,7 @@ namespace MathTests
         // Очень маленькие значения
         {
             float epsilon = Constants::Constants<float>::Epsilon;
-            float4x4 tinyMat = float4x4::scaling(epsilon);
+            float4x4 tinyMat(epsilon);
 
             suite.assert_true(tinyMat.approximately_zero(epsilon * 2),
                 "approximately_zero with tiny values");
