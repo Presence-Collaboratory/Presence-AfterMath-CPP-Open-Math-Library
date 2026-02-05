@@ -43,56 +43,11 @@
     <Filter Include="Autotests\Primitives\Axis aligned bounding box">
       <UniqueIdentifier>{8150b045-dda0-4bad-8d9b-9014b71727c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math\Include">
+      <UniqueIdentifier>{539ea276-2c90-4b21-921a-b5d192bc23d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MathAPI\MathAPI.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_config.h">
-      <Filter>Math\Implementation</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_constants.h">
-      <Filter>Math\Implementation</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_fast_functions.h">
-      <Filter>Math\Implementation</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_functions.h">
-      <Filter>Math\Implementation</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_float2.h">
-      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_float3.h">
-      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_float4.h">
-      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_half.h">
-      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_half2.h">
-      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_half3.h">
-      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_half4.h">
-      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_float3x3.h">
-      <Filter>Math\Implementation\Primitives\Matrices</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_float4x4.h">
-      <Filter>Math\Implementation\Primitives\Matrices</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_quaternion.h">
-      <Filter>Math\Implementation\Primitives\Quaternion</Filter>
-    </ClInclude>
-    <ClInclude Include="MathAPI\math_float2x2.h">
-      <Filter>Math\Implementation\Primitives\Matrices</Filter>
-    </ClInclude>
     <ClInclude Include="Autotests\AutotestCore.h">
       <Filter>Autotests</Filter>
     </ClInclude>
@@ -105,43 +60,91 @@
     <ClInclude Include="Autotests\autotests_quaternion.h">
       <Filter>Autotests\Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="MathAPI\math_aabb.h">
-      <Filter>Math\Implementation\Primitives\Axis aligned bounding box</Filter>
-    </ClInclude>
     <ClInclude Include="Autotests\autotests_aabb.h">
       <Filter>Autotests\Primitives\Axis aligned bounding box</Filter>
     </ClInclude>
+    <ClInclude Include="AfterMath\AfterMath.h">
+      <Filter>Math\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_aabb.h">
+      <Filter>Math\Implementation\Primitives\Axis aligned bounding box</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_float2x2.h">
+      <Filter>Math\Implementation\Primitives\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_float3x3.h">
+      <Filter>Math\Implementation\Primitives\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_float4x4.h">
+      <Filter>Math\Implementation\Primitives\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_quaternion.h">
+      <Filter>Math\Implementation\Primitives\Quaternion</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_float2.h">
+      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_float3.h">
+      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_float4.h">
+      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_half.h">
+      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_half2.h">
+      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_half3.h">
+      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_half4.h">
+      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_config.h">
+      <Filter>Math\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_constants.h">
+      <Filter>Math\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_fast_functions.h">
+      <Filter>Math\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="AfterMath\math_functions.h">
+      <Filter>Math\Implementation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MathAPI\math_float2.inl">
-      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
-    </None>
-    <None Include="MathAPI\math_float3.inl">
-      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
-    </None>
-    <None Include="MathAPI\math_float4.inl">
-      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
-    </None>
-    <None Include="MathAPI\math_float2x2.inl">
-      <Filter>Math\Implementation\Primitives\Matrices</Filter>
-    </None>
-    <None Include="MathAPI\math_float3x3.inl">
-      <Filter>Math\Implementation\Primitives\Matrices</Filter>
-    </None>
-    <None Include="MathAPI\math_float4x4.inl">
-      <Filter>Math\Implementation\Primitives\Matrices</Filter>
-    </None>
-    <None Include="MathAPI\math_half2.inl">
-      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
-    </None>
-    <None Include="MathAPI\math_half3.inl">
-      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
-    </None>
-    <None Include="MathAPI\math_half4.inl">
-      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
-    </None>
-    <None Include="MathAPI\math_aabb.inl">
+    <None Include="AfterMath\math_aabb.inl">
       <Filter>Math\Implementation\Primitives\Axis aligned bounding box</Filter>
+    </None>
+    <None Include="AfterMath\math_float2x2.inl">
+      <Filter>Math\Implementation\Primitives\Matrices</Filter>
+    </None>
+    <None Include="AfterMath\math_float3x3.inl">
+      <Filter>Math\Implementation\Primitives\Matrices</Filter>
+    </None>
+    <None Include="AfterMath\math_float4x4.inl">
+      <Filter>Math\Implementation\Primitives\Matrices</Filter>
+    </None>
+    <None Include="AfterMath\math_float2.inl">
+      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
+    </None>
+    <None Include="AfterMath\math_float3.inl">
+      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
+    </None>
+    <None Include="AfterMath\math_float4.inl">
+      <Filter>Math\Implementation\Primitives\Vectors\Float</Filter>
+    </None>
+    <None Include="AfterMath\math_half2.inl">
+      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
+    </None>
+    <None Include="AfterMath\math_half3.inl">
+      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
+    </None>
+    <None Include="AfterMath\math_half4.inl">
+      <Filter>Math\Implementation\Primitives\Vectors\Half</Filter>
     </None>
   </ItemGroup>
 </Project>

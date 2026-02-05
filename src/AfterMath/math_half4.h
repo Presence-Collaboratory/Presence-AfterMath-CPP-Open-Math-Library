@@ -28,7 +28,7 @@
 #include "math_half3.h"
 #include "math_float4.h"
 
-namespace Math
+namespace AfterMath
 {
     /**
      * @class half4
@@ -388,7 +388,7 @@ namespace Math
     extern const half4 half4_Cyan;
     extern const half4 half4_Magenta;
 
-} // namespace Math
+} // namespace AfterMath
 
 // Include inline implementation
 #include "math_half4.inl"

@@ -1,16 +1,16 @@
 // Author: DeepSeek
-// Test suite for Math::float4x4 class
+// Test suite for AfterMath::float4x4 class
 
 #include "AutotestCore.h"
 
-namespace MathTests
+namespace AfterMathTests
 {
     void RunFloat4x4Tests()
     {
         TestSuite suite("Float4x4 Tests", true);
         suite.header();
 
-        using namespace Math;
+        using namespace AfterMath;
 
         // ============================================================================
         // 1. Конструкторы и базовые операции

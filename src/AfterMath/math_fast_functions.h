@@ -13,7 +13,7 @@
 #include "math_functions.h"
 
 ///////////////////////////////////////////////////////////////
-namespace Math
+namespace AfterMath
 {
     /**
      * @namespace FastMath
@@ -687,4 +687,4 @@ namespace Math
     using FastMath::fast_log;
     using FastMath::fast_pow;
 
-} // namespace Math
+} // namespace AfterMath

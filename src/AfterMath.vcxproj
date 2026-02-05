@@ -158,40 +158,40 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AfterMath\AfterMath.h" />
+    <ClInclude Include="AfterMath\math_aabb.h" />
+    <ClInclude Include="AfterMath\math_config.h" />
+    <ClInclude Include="AfterMath\math_constants.h" />
+    <ClInclude Include="AfterMath\math_fast_functions.h" />
+    <ClInclude Include="AfterMath\math_float2.h" />
+    <ClInclude Include="AfterMath\math_float2x2.h" />
+    <ClInclude Include="AfterMath\math_float3.h" />
+    <ClInclude Include="AfterMath\math_float3x3.h" />
+    <ClInclude Include="AfterMath\math_float4.h" />
+    <ClInclude Include="AfterMath\math_float4x4.h" />
+    <ClInclude Include="AfterMath\math_functions.h" />
+    <ClInclude Include="AfterMath\math_half.h" />
+    <ClInclude Include="AfterMath\math_half2.h" />
+    <ClInclude Include="AfterMath\math_half3.h" />
+    <ClInclude Include="AfterMath\math_half4.h" />
+    <ClInclude Include="AfterMath\math_quaternion.h" />
     <ClInclude Include="Autotests\AutotestCore.h" />
     <ClInclude Include="Autotests\autotests_aabb.h" />
     <ClInclude Include="Autotests\autotests_float3x3.h" />
     <ClInclude Include="Autotests\autotests_float4x4.h" />
     <ClInclude Include="Autotests\autotests_quaternion.h" />
-    <ClInclude Include="MathAPI\MathAPI.h" />
-    <ClInclude Include="MathAPI\math_aabb.h" />
-    <ClInclude Include="MathAPI\math_config.h" />
-    <ClInclude Include="MathAPI\math_constants.h" />
-    <ClInclude Include="MathAPI\math_fast_functions.h" />
-    <ClInclude Include="MathAPI\math_float2.h" />
-    <ClInclude Include="MathAPI\math_float2x2.h" />
-    <ClInclude Include="MathAPI\math_float3.h" />
-    <ClInclude Include="MathAPI\math_float3x3.h" />
-    <ClInclude Include="MathAPI\math_float4.h" />
-    <ClInclude Include="MathAPI\math_float4x4.h" />
-    <ClInclude Include="MathAPI\math_functions.h" />
-    <ClInclude Include="MathAPI\math_half.h" />
-    <ClInclude Include="MathAPI\math_half2.h" />
-    <ClInclude Include="MathAPI\math_half3.h" />
-    <ClInclude Include="MathAPI\math_half4.h" />
-    <ClInclude Include="MathAPI\math_quaternion.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MathAPI\math_aabb.inl" />
-    <None Include="MathAPI\math_float2.inl" />
-    <None Include="MathAPI\math_float2x2.inl" />
-    <None Include="MathAPI\math_float3.inl" />
-    <None Include="MathAPI\math_float3x3.inl" />
-    <None Include="MathAPI\math_float4.inl" />
-    <None Include="MathAPI\math_float4x4.inl" />
-    <None Include="MathAPI\math_half2.inl" />
-    <None Include="MathAPI\math_half3.inl" />
-    <None Include="MathAPI\math_half4.inl" />
+    <None Include="AfterMath\math_aabb.inl" />
+    <None Include="AfterMath\math_float2.inl" />
+    <None Include="AfterMath\math_float2x2.inl" />
+    <None Include="AfterMath\math_float3.inl" />
+    <None Include="AfterMath\math_float3x3.inl" />
+    <None Include="AfterMath\math_float4.inl" />
+    <None Include="AfterMath\math_float4x4.inl" />
+    <None Include="AfterMath\math_half2.inl" />
+    <None Include="AfterMath\math_half3.inl" />
+    <None Include="AfterMath\math_half4.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

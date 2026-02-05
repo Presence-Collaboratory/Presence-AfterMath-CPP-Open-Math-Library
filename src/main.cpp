@@ -8,10 +8,10 @@
 
 int main()
 {
-    MathTests::RunFloat3x3Tests();
-    MathTests::RunFloat4x4Tests();
-    MathTests::RunQuaternionTests();
-    MathTests::RunAABBTests();
+    AfterMathTests::RunFloat3x3Tests();
+    AfterMathTests::RunFloat4x4Tests();
+    AfterMathTests::RunQuaternionTests();
+    AfterMathTests::RunAABBTests();
 
     // Для ожидания перед закрытием (если консольное приложение)
     std::cout << "\nPress Enter to exit...";

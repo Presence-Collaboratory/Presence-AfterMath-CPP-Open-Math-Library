@@ -2,7 +2,7 @@
 // Author: NSDeathman, DeepSeek
 #pragma once
 
-namespace Math
+namespace AfterMath
 {
     // ============================================================================
     // Helper Methods for Packed SSE
@@ -334,7 +334,7 @@ namespace Math
         float3 an = a.normalize();
         float3 bn = b.normalize();
         float d = dot(an, bn);
-        d = MathFunctions::clamp(d, -1.0f, 1.0f);
+        d = AfterMathFunctions::clamp(d, -1.0f, 1.0f);
 
         if (d > 0.9995f) return lerp(an, bn, t).normalize();
 
@@ -535,7 +535,7 @@ namespace Math
     inline float3 slerp(const float3& a, const float3& b, float t) noexcept { return float3::slerp(a, b, t); }
     inline bool approximately(const float3& a, const float3& b, float epsilon) noexcept { return a.approximately(b, epsilon); }
     inline bool is_normalized(const float3& vec, float epsilon) noexcept { return vec.is_normalized(epsilon); }
-    inline bool are_orthogonal(const float3& a, const float3& b, float epsilon) noexcept { return MathFunctions::approximately(dot(a, b), 0.0f, epsilon); }
+    inline bool are_orthogonal(const float3& a, const float3& b, float epsilon) noexcept { return AfterMathFunctions::approximately(dot(a, b), 0.0f, epsilon); }
     inline bool is_orthonormal_basis(const float3& x, const float3& y, const float3& z, float epsilon) noexcept {
         return is_normalized(x, epsilon) && is_normalized(y, epsilon) && is_normalized(z, epsilon) &&
             are_orthogonal(x, y, epsilon) && are_orthogonal(x, z, epsilon) && are_orthogonal(y, z, epsilon);
@@ -621,4 +621,4 @@ namespace Math
     inline const float3 float3_Up(0.0f, 1.0f, 0.0f);
     inline const float3 float3_Right(1.0f, 0.0f, 0.0f);
 
-} // namespace Math
+} // namespace AfterMath

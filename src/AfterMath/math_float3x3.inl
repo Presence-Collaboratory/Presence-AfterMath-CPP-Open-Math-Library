@@ -1,7 +1,7 @@
 ﻿#ifndef MATH_FLOAT3X3_INL
 #define MATH_FLOAT3X3_INL
 
-namespace Math
+namespace AfterMath
 {
     inline float3x3 operator+(float3x3 lhs, const float3x3& rhs) noexcept
     {
@@ -365,7 +365,7 @@ namespace Math
     inline float3x3 float3x3::rotation_x(float angle) noexcept
     {
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
 
         return float3x3(
             float3(1.0f, 0.0f, 0.0f),
@@ -377,7 +377,7 @@ namespace Math
     inline float3x3 float3x3::rotation_y(float angle) noexcept
     {
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
 
         return float3x3(
             float3(c, 0.0f, s),
@@ -389,7 +389,7 @@ namespace Math
     inline float3x3 float3x3::rotation_z(float angle) noexcept
     {
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
 
         return float3x3(
             float3(c, -s, 0.0f),
@@ -405,7 +405,7 @@ namespace Math
         }
 
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
 
         const float one_minus_c = 1.0f - c;
         const float3 n = axis.normalize();
@@ -657,17 +657,17 @@ namespace Math
 
     inline bool float3x3::is_orthogonal(float epsilon) const noexcept
     {
-        return MathFunctions::approximately(dot(col0(), col1()), 0.0f, epsilon) &&
-            MathFunctions::approximately(dot(col0(), col2()), 0.0f, epsilon) &&
-            MathFunctions::approximately(dot(col1(), col2()), 0.0f, epsilon);
+        return AfterMathFunctions::approximately(dot(col0(), col1()), 0.0f, epsilon) &&
+            AfterMathFunctions::approximately(dot(col0(), col2()), 0.0f, epsilon) &&
+            AfterMathFunctions::approximately(dot(col1(), col2()), 0.0f, epsilon);
     }
 
     inline bool float3x3::is_orthonormal(float epsilon) const noexcept
     {
         return is_orthogonal(epsilon) &&
-            MathFunctions::approximately(col0().length_sq(), 1.0f, epsilon) &&
-            MathFunctions::approximately(col1().length_sq(), 1.0f, epsilon) &&
-            MathFunctions::approximately(col2().length_sq(), 1.0f, epsilon);
+            AfterMathFunctions::approximately(col0().length_sq(), 1.0f, epsilon) &&
+            AfterMathFunctions::approximately(col1().length_sq(), 1.0f, epsilon) &&
+            AfterMathFunctions::approximately(col2().length_sq(), 1.0f, epsilon);
     }
 
     inline bool float3x3::approximately(const float3x3& other, float epsilon) const noexcept

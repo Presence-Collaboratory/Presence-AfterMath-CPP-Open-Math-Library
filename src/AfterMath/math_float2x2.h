@@ -11,7 +11,7 @@
 #include "math_functions.h"
 #include "math_float2.h"
 
-namespace Math
+namespace AfterMath
 {
     class float2x2
     {

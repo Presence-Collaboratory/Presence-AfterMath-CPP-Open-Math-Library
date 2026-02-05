@@ -2,7 +2,7 @@
 #pragma once
 
 /**
- * @file MathFunctions.h
+ * @file AfterMathFunctions.h
  * @brief Floating-point comparison utilities and mathematical helper functions
  * @note Includes advanced comparison algorithms for robust floating-point operations
  */
@@ -14,11 +14,11 @@
 
 #include "math_constants.h"
 
-namespace Math
+namespace AfterMath
 {
 
     /**
-     * @namespace MathFunctions
+     * @namespace AfterMathFunctions
      * @brief Advanced floating-point comparison and mathematical utility functions
      *
      * Provides robust floating-point comparison functions using various algorithms:
@@ -28,7 +28,7 @@ namespace Math
      * - ULPs (Units in Last Place) comparison
      * - Specialized comparisons for angles, colors, etc.
      */
-    namespace MathFunctions 
+    namespace AfterMathFunctions 
     {
 
         // ============================================================================
@@ -392,18 +392,18 @@ namespace Math
             return angle;
         }
 
-    } // namespace MathFunctions
+    } // namespace AfterMathFunctions
 
     // ============================================================================
     // Global Using Declarations for Convenience
     // ============================================================================
 
     // Bring commonly used functions into Math namespace
-    using MathFunctions::approximately;
-    using MathFunctions::approximately_zero;
-    using MathFunctions::approximately_angle;
-    using MathFunctions::is_finite;
-    using MathFunctions::clamp;
-    using MathFunctions::lerp;
+    using AfterMathFunctions::approximately;
+    using AfterMathFunctions::approximately_zero;
+    using AfterMathFunctions::approximately_angle;
+    using AfterMathFunctions::is_finite;
+    using AfterMathFunctions::clamp;
+    using AfterMathFunctions::lerp;
 
-} // namespace Math
+} // namespace AfterMath

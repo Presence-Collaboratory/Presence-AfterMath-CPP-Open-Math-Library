@@ -1,16 +1,16 @@
 ﻿// Author: Deepseek
-// Test suite for Math::AABB class
+// Test suite for AfterMath::AABB class
 
 #include "AutotestCore.h"
 
-namespace MathTests
+namespace AfterMathTests
 {
     void RunAABBTests()
     {
         TestSuite suite("AABB Tests", true);
         suite.header();
 
-        using namespace Math;
+        using namespace AfterMath;
 
         // ============================================================================
         // 1. Конструкторы и базовые операции

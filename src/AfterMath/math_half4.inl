@@ -7,7 +7,7 @@
 #ifndef MATH_HALF4_INL
 #define MATH_HALF4_INL
 
-namespace Math {
+namespace AfterMath {
 
     // ============================================================================
     // Constructors Implementation
@@ -290,32 +290,32 @@ namespace Math {
 
     inline half4 half4::abs() const noexcept
     {
-        return half4(Math::abs(x), Math::abs(y), Math::abs(z), Math::abs(w));
+        return half4(AfterMath::abs(x), AfterMath::abs(y), AfterMath::abs(z), AfterMath::abs(w));
     }
 
     inline half4 half4::sign() const noexcept
     {
-        return half4(Math::sign(x), Math::sign(y), Math::sign(z), Math::sign(w));
+        return half4(AfterMath::sign(x), AfterMath::sign(y), AfterMath::sign(z), AfterMath::sign(w));
     }
 
     inline half4 half4::floor() const noexcept
     {
-        return half4(Math::floor(x), Math::floor(y), Math::floor(z), Math::floor(w));
+        return half4(AfterMath::floor(x), AfterMath::floor(y), AfterMath::floor(z), AfterMath::floor(w));
     }
 
     inline half4 half4::ceil() const noexcept
     {
-        return half4(Math::ceil(x), Math::ceil(y), Math::ceil(z), Math::ceil(w));
+        return half4(AfterMath::ceil(x), AfterMath::ceil(y), AfterMath::ceil(z), AfterMath::ceil(w));
     }
 
     inline half4 half4::round() const noexcept
     {
-        return half4(Math::round(x), Math::round(y), Math::round(z), Math::round(w));
+        return half4(AfterMath::round(x), AfterMath::round(y), AfterMath::round(z), AfterMath::round(w));
     }
 
     inline half4 half4::frac() const noexcept
     {
-        return half4(Math::frac(x), Math::frac(y), Math::frac(z), Math::frac(w));
+        return half4(AfterMath::frac(x), AfterMath::frac(y), AfterMath::frac(z), AfterMath::frac(w));
     }
 
     inline half4 half4::saturate() const noexcept
@@ -325,7 +325,7 @@ namespace Math {
 
     inline half4 half4::step(half edge) const noexcept
     {
-        return half4(Math::step(edge, x), Math::step(edge, y), Math::step(edge, z), Math::step(edge, w));
+        return half4(AfterMath::step(edge, x), AfterMath::step(edge, y), AfterMath::step(edge, z), AfterMath::step(edge, w));
     }
 
     // ============================================================================
@@ -528,10 +528,10 @@ namespace Math {
     inline half4 half4::saturate(const half4& vec) noexcept
     {
         return half4(
-            Math::saturate(vec.x),
-            Math::saturate(vec.y),
-            Math::saturate(vec.z),
-            Math::saturate(vec.w)
+            AfterMath::saturate(vec.x),
+            AfterMath::saturate(vec.y),
+            AfterMath::saturate(vec.z),
+            AfterMath::saturate(vec.w)
         );
     }
 
@@ -995,20 +995,20 @@ namespace Math {
     inline half4 clamp(const half4& vec, float min_val, float max_val) noexcept
     {
         return half4(
-            Math::clamp(vec.x, min_val, max_val),
-            Math::clamp(vec.y, min_val, max_val),
-            Math::clamp(vec.z, min_val, max_val),
-            Math::clamp(vec.w, min_val, max_val)
+            AfterMath::clamp(vec.x, min_val, max_val),
+            AfterMath::clamp(vec.y, min_val, max_val),
+            AfterMath::clamp(vec.z, min_val, max_val),
+            AfterMath::clamp(vec.w, min_val, max_val)
         );
     }
 
     inline half4 smoothstep(half edge0, half edge1, const half4& vec) noexcept
     {
         return half4(
-            Math::smoothstep(edge0, edge1, vec.x),
-            Math::smoothstep(edge0, edge1, vec.y),
-            Math::smoothstep(edge0, edge1, vec.z),
-            Math::smoothstep(edge0, edge1, vec.w)
+            AfterMath::smoothstep(edge0, edge1, vec.x),
+            AfterMath::smoothstep(edge0, edge1, vec.y),
+            AfterMath::smoothstep(edge0, edge1, vec.z),
+            AfterMath::smoothstep(edge0, edge1, vec.w)
         );
     }
 
@@ -1099,6 +1099,6 @@ namespace Math {
     inline const half4 half4_Cyan(half_Zero, half_One, half_One, half_One);
     inline const half4 half4_Magenta(half_One, half_Zero, half_One, half_One);
 
-} // namespace Math
+} // namespace AfterMath
 
 #endif // MATH_HALF4_INL

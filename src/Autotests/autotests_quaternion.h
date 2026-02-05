@@ -3,14 +3,14 @@
 
 #include "AutotestCore.h"
 
-namespace MathTests
+namespace AfterMathTests
 {
     void RunQuaternionTests()
     {
         TestSuite suite("Quaternion Tests");
         suite.header();
 
-        using namespace Math;
+        using namespace AfterMath;
 
         // ============================================================================
         // 1. Конструкторы и фабричные методы

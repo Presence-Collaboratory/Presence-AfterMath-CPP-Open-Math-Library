@@ -16,7 +16,7 @@
 #include "math_functions.h"
 #include "math_float2.h"
 
-namespace Math
+namespace AfterMath
 {
     /**
      * @class float3
@@ -749,6 +749,6 @@ namespace Math
     extern const float3 float3_Up;
     extern const float3 float3_Right;
 
-} // namespace Math
+} // namespace AfterMath
 
 #include "math_float3.inl"

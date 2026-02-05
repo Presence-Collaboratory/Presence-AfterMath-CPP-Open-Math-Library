@@ -1,7 +1,7 @@
 #ifndef MATH_FLOAT2X2_INL
 #define MATH_FLOAT2X2_INL
 
-namespace Math
+namespace AfterMath
 {
     inline float2x2 operator+(float2x2 lhs, const float2x2& rhs) noexcept
     {
@@ -124,7 +124,7 @@ namespace Math
     inline float2x2 float2x2::rotation(float angle) noexcept
     {
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
         return float2x2(float2(c, -s), float2(s, c));
     }
 
@@ -337,7 +337,7 @@ namespace Math
         bool has_reflection = determinant() < 0.0f;
 
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
 
         if (has_reflection) {
             s = -s;
@@ -362,15 +362,15 @@ namespace Math
 
     inline bool float2x2::is_orthogonal(float epsilon) const noexcept
     {
-        return MathFunctions::approximately(dot(col0(), col1()), 0.0f, epsilon);
+        return AfterMathFunctions::approximately(dot(col0(), col1()), 0.0f, epsilon);
     }
 
     inline bool float2x2::is_rotation(float epsilon) const noexcept
     {
         return is_orthogonal(epsilon) &&
-            MathFunctions::approximately(col0().length_sq(), 1.0f, epsilon) &&
-            MathFunctions::approximately(col1().length_sq(), 1.0f, epsilon) &&
-            MathFunctions::approximately(determinant(), 1.0f, epsilon);
+            AfterMathFunctions::approximately(col0().length_sq(), 1.0f, epsilon) &&
+            AfterMathFunctions::approximately(col1().length_sq(), 1.0f, epsilon) &&
+            AfterMathFunctions::approximately(determinant(), 1.0f, epsilon);
     }
 
     inline bool float2x2::approximately(const float2x2& other, float epsilon) const noexcept

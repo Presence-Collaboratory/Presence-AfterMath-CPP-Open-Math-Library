@@ -3,10 +3,10 @@
 // Author: NSDeathman, DeepSeek
 #pragma once
 
-#include "MathAPI.h"
+#include "AfterMath.h"
 #include <algorithm>
 
-namespace Math
+namespace AfterMath
 {
     /**
      * @class AABB
@@ -353,6 +353,6 @@ namespace Math
 
     extern const AABB AABB_Empty;
     extern const AABB AABB_Infinite;
-} // namespace Math
+} // namespace AfterMath
 
 #include "math_aabb.inl"

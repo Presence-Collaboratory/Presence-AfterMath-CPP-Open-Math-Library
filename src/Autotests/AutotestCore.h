@@ -11,11 +11,11 @@
 #include <limits>
 
 // Include the math library
-#include "../MathAPI/MathAPI.h"
+#include "../AfterMath/AfterMath.h"
 
-namespace MathTests
+namespace AfterMathTests
 {
-    using namespace Math;
+    using namespace AfterMath;
 
     // ============================================================================
     // Test Configuration
@@ -387,4 +387,4 @@ namespace MathTests
             return total > 0 ? (static_cast<double>(tests_passed) / total) * 100.0 : 0.0;
         }
     };
-} // namespace MathTests
+} // namespace AfterMathTests

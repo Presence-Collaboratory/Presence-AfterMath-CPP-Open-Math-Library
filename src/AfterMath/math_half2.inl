@@ -4,7 +4,7 @@
  * @note Optimized for texture coordinates and memory-constrained applications
  */
 
-namespace Math {
+namespace AfterMath {
 
     // ============================================================================
     // Constructors Implementation
@@ -220,32 +220,32 @@ namespace Math {
 
     inline half2 half2::abs() const noexcept
     {
-        return half2(Math::abs(x), Math::abs(y));
+        return half2(AfterMath::abs(x), AfterMath::abs(y));
     }
 
     inline half2 half2::sign() const noexcept
     {
-        return half2(Math::sign(x), Math::sign(y));
+        return half2(AfterMath::sign(x), AfterMath::sign(y));
     }
 
     inline half2 half2::floor() const noexcept
     {
-        return half2(Math::floor(x), Math::floor(y));
+        return half2(AfterMath::floor(x), AfterMath::floor(y));
     }
 
     inline half2 half2::ceil() const noexcept
     {
-        return half2(Math::ceil(x), Math::ceil(y));
+        return half2(AfterMath::ceil(x), AfterMath::ceil(y));
     }
 
     inline half2 half2::round() const noexcept
     {
-        return half2(Math::round(x), Math::round(y));
+        return half2(AfterMath::round(x), AfterMath::round(y));
     }
 
     inline half2 half2::frac() const noexcept
     {
-        return half2(Math::frac(x), Math::frac(y));
+        return half2(AfterMath::frac(x), AfterMath::frac(y));
     }
 
     inline half2 half2::saturate() const noexcept
@@ -255,7 +255,7 @@ namespace Math {
 
     inline half2 half2::step(half edge) const noexcept
     {
-        return half2(Math::step(edge, x), Math::step(edge, y));
+        return half2(AfterMath::step(edge, x), AfterMath::step(edge, y));
     }
 
     // ============================================================================
@@ -280,8 +280,8 @@ namespace Math {
     inline half2 half2::saturate(const half2& vec) noexcept
     {
         return half2(
-            Math::saturate(vec.x),
-            Math::saturate(vec.y)
+            AfterMath::saturate(vec.x),
+            AfterMath::saturate(vec.y)
         );
     }
 
@@ -369,7 +369,7 @@ namespace Math {
     {
         half len_sq = length_sq();
         float adjusted_epsilon = std::max(epsilon, 0.01f);
-        return MathFunctions::approximately(float(len_sq), 1.0f, adjusted_epsilon);
+        return AfterMathFunctions::approximately(float(len_sq), 1.0f, adjusted_epsilon);
     }
 
     inline std::string half2::to_string() const
@@ -677,16 +677,16 @@ namespace Math {
     inline half2 clamp(const half2& vec, float min_val, float max_val) noexcept
     {
         return half2(
-            Math::clamp(vec.x, min_val, max_val),
-            Math::clamp(vec.y, min_val, max_val)
+            AfterMath::clamp(vec.x, min_val, max_val),
+            AfterMath::clamp(vec.y, min_val, max_val)
         );
     }
 
     inline half2 smoothstep(half edge0, half edge1, const half2& vec) noexcept
     {
         return half2(
-            Math::smoothstep(edge0, edge1, vec.x),
-            Math::smoothstep(edge0, edge1, vec.y)
+            AfterMath::smoothstep(edge0, edge1, vec.x),
+            AfterMath::smoothstep(edge0, edge1, vec.y)
         );
     }
 
@@ -714,7 +714,7 @@ namespace Math {
         half2 a_norm = a.normalize();
         half2 b_norm = b.normalize();
         half dot_val = dot(a_norm, b_norm);
-        dot_val = Math::clamp(dot_val, -half_One, half_One);
+        dot_val = AfterMath::clamp(dot_val, -half_One, half_One);
         return half(std::acos(float(dot_val)));
     }
 
@@ -748,4 +748,4 @@ namespace Math {
     inline const half2 half2_Up(half_Zero, half_One);
     inline const half2 half2_Down(half_Zero, -half_One);
 
-} // namespace Math
+} // namespace AfterMath

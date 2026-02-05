@@ -2,7 +2,7 @@
 #pragma once
 #include <emmintrin.h> // Required for _mm_load_sd
 
-namespace Math {
+namespace AfterMath {
 
     inline __m128 _load_float2_fast(const float* ptr) {
         return _mm_castpd_ps(_mm_load_sd(reinterpret_cast<const double*>(ptr)));

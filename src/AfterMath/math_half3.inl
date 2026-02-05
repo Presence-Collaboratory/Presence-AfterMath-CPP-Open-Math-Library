@@ -4,7 +4,7 @@
  * @note Optimized for 3D graphics, normals, colors with SSE optimization
  */
 
-namespace Math {
+namespace AfterMath {
 
     // ============================================================================
     // Constructors Implementation
@@ -258,32 +258,32 @@ namespace Math {
 
     inline half3 half3::abs() const noexcept
     {
-        return half3(Math::abs(x), Math::abs(y), Math::abs(z));
+        return half3(AfterMath::abs(x), AfterMath::abs(y), AfterMath::abs(z));
     }
 
     inline half3 half3::sign() const noexcept
     {
-        return half3(Math::sign(x), Math::sign(y), Math::sign(z));
+        return half3(AfterMath::sign(x), AfterMath::sign(y), AfterMath::sign(z));
     }
 
     inline half3 half3::floor() const noexcept
     {
-        return half3(Math::floor(x), Math::floor(y), Math::floor(z));
+        return half3(AfterMath::floor(x), AfterMath::floor(y), AfterMath::floor(z));
     }
 
     inline half3 half3::ceil() const noexcept
     {
-        return half3(Math::ceil(x), Math::ceil(y), Math::ceil(z));
+        return half3(AfterMath::ceil(x), AfterMath::ceil(y), AfterMath::ceil(z));
     }
 
     inline half3 half3::round() const noexcept
     {
-        return half3(Math::round(x), Math::round(y), Math::round(z));
+        return half3(AfterMath::round(x), AfterMath::round(y), AfterMath::round(z));
     }
 
     inline half3 half3::frac() const noexcept
     {
-        return half3(Math::frac(x), Math::frac(y), Math::frac(z));
+        return half3(AfterMath::frac(x), AfterMath::frac(y), AfterMath::frac(z));
     }
 
     inline half3 half3::saturate() const noexcept
@@ -293,7 +293,7 @@ namespace Math {
 
     inline half3 half3::step(half edge) const noexcept
     {
-        return half3(Math::step(edge, x), Math::step(edge, y), Math::step(edge, z));
+        return half3(AfterMath::step(edge, x), AfterMath::step(edge, y), AfterMath::step(edge, z));
     }
 
     // ============================================================================
@@ -376,9 +376,9 @@ namespace Math {
     inline half3 half3::saturate(const half3& vec) noexcept
     {
         return half3(
-            Math::saturate(vec.x),
-            Math::saturate(vec.y),
-            Math::saturate(vec.z)
+            AfterMath::saturate(vec.x),
+            AfterMath::saturate(vec.y),
+            AfterMath::saturate(vec.z)
         );
     }
 
@@ -434,7 +434,7 @@ namespace Math {
 
     inline half3 half3::gamma_correct(half gamma) const noexcept
     {
-        return half3(Math::pow(x, gamma), Math::pow(y, gamma), Math::pow(z, gamma));
+        return half3(AfterMath::pow(x, gamma), AfterMath::pow(y, gamma), AfterMath::pow(z, gamma));
     }
 
     inline half3 half3::srgb_to_linear() const noexcept
@@ -774,18 +774,18 @@ namespace Math {
     inline half3 clamp(const half3& vec, float min_val, float max_val) noexcept
     {
         return half3(
-            Math::clamp(vec.x, min_val, max_val),
-            Math::clamp(vec.y, min_val, max_val),
-            Math::clamp(vec.z, min_val, max_val)
+            AfterMath::clamp(vec.x, min_val, max_val),
+            AfterMath::clamp(vec.y, min_val, max_val),
+            AfterMath::clamp(vec.z, min_val, max_val)
         );
     }
 
     inline half3 smoothstep(half edge0, half edge1, const half3& vec) noexcept
     {
         return half3(
-            Math::smoothstep(edge0, edge1, vec.x),
-            Math::smoothstep(edge0, edge1, vec.y),
-            Math::smoothstep(edge0, edge1, vec.z)
+            AfterMath::smoothstep(edge0, edge1, vec.x),
+            AfterMath::smoothstep(edge0, edge1, vec.y),
+            AfterMath::smoothstep(edge0, edge1, vec.z)
         );
     }
 
@@ -813,7 +813,7 @@ namespace Math {
         }
 
         half dot_val = dot(a_norm, b_norm);
-        dot_val = Math::clamp(dot_val, -half(1.0f), half(1.0f));
+        dot_val = AfterMath::clamp(dot_val, -half(1.0f), half(1.0f));
         return half(std::acos(float(dot_val)));
     }
 
@@ -870,7 +870,7 @@ namespace Math {
         if (len_sq > half::epsilon())
         {
             half len = sqrt(len_sq);
-            if (Math::abs(len - half_One) > half(0.01f))
+            if (AfterMath::abs(len - half_One) > half(0.01f))
             {
                 return normal / len;
             }
@@ -900,4 +900,4 @@ namespace Math {
     inline const half3 half3_Cyan(half_Zero, half_One, half_One);
     inline const half3 half3_Magenta(half_One, half_Zero, half_One);
 
-} // namespace Math
+} // namespace AfterMath

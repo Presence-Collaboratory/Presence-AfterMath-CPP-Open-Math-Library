@@ -5,7 +5,7 @@
 
 #pragma once
 
-namespace Math
+namespace AfterMath
 {
     // ============================================================================
     // Constructors Implementation
@@ -517,7 +517,7 @@ namespace Math
 
     inline bool float4::is_normalized(float epsilon) const noexcept {
         float len_sq = length_sq();
-        return std::isfinite(len_sq) && MathFunctions::approximately(len_sq, 1.0f, epsilon);
+        return std::isfinite(len_sq) && AfterMathFunctions::approximately(len_sq, 1.0f, epsilon);
     }
 
     inline std::string float4::to_string() const {
@@ -751,4 +751,4 @@ namespace Math
     inline const float4 float4_Cyan(0.0f, 1.0f, 1.0f, 1.0f);
     inline const float4 float4_Magenta(1.0f, 0.0f, 1.0f, 1.0f);
 
-} // namespace Math
+} // namespace AfterMath

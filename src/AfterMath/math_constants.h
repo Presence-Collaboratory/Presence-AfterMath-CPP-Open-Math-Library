@@ -22,7 +22,7 @@
 #undef max
 #undef min
 
-namespace Math
+namespace AfterMath
 {
     /**
      * @namespace Constants
@@ -305,4 +305,4 @@ namespace Math
     using Constants::degrees_to_radians;
     using Constants::radians_to_degrees;
 
-} // namespace Math
+} // namespace AfterMath

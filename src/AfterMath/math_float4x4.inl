@@ -5,7 +5,7 @@
 #include "math_float3x3.h"
 #include "math_quaternion.h"
 
-namespace Math
+namespace AfterMath
 {
     inline float4x4 operator+(const float4x4& lhs, const float4x4& rhs) noexcept { return float4x4(lhs) += rhs; }
     inline float4x4 operator-(const float4x4& lhs, const float4x4& rhs) noexcept { return float4x4(lhs) -= rhs; }
@@ -100,13 +100,13 @@ namespace Math
 
     inline float4x4 float4x4::rotation_x(float angle) noexcept {
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
         return float4x4(1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1);
     }
 
     inline float4x4 float4x4::rotation_y(float angle) noexcept {
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
         // LH Rotation Y: [c 0 -s]
         return float4x4(
             c, 0, -s, 0,
@@ -118,7 +118,7 @@ namespace Math
 
     inline float4x4 float4x4::rotation_z(float angle) noexcept {
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
         return float4x4(c, -s, 0, 0, s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     }
 
@@ -128,7 +128,7 @@ namespace Math
         }
 
         float s, c;
-        MathFunctions::sin_cos(angle, &s, &c);
+        AfterMathFunctions::sin_cos(angle, &s, &c);
         float t = 1.0f - c;
         float3 n = axis.normalize();
         float x = n.x, y = n.y, z = n.z;
@@ -573,9 +573,9 @@ namespace Math
         float len1 = r1.length_sq();
         float len2 = r2.length_sq();
 
-        return MathFunctions::approximately(len0, 1.0f, epsilon) &&
-            MathFunctions::approximately(len1, 1.0f, epsilon) &&
-            MathFunctions::approximately(len2, 1.0f, epsilon);
+        return AfterMathFunctions::approximately(len0, 1.0f, epsilon) &&
+            AfterMathFunctions::approximately(len1, 1.0f, epsilon) &&
+            AfterMathFunctions::approximately(len2, 1.0f, epsilon);
     }
 
     inline bool float4x4::approximately(const float4x4& o, float e) const noexcept {

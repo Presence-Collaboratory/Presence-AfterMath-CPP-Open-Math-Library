@@ -2,7 +2,7 @@
 // Author: NSDeathman, DeepSeek
 #pragma once
 
-namespace Math
+namespace AfterMath
 {
     // ============================================================================
     // Constructors Implementation
@@ -406,4 +406,4 @@ namespace Math
         float3(-Constants::INFINITY),
         float3(Constants::INFINITY)
     );
-} // namespace Math
+} // namespace AfterMath

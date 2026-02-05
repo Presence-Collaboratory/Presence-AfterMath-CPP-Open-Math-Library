@@ -17,7 +17,7 @@
 #include "math_float3x3.h"
 #include "math_float4x4.h"
 
-namespace Math
+namespace AfterMath
 {
     class quaternion;
 
@@ -250,8 +250,8 @@ namespace Math
             return quaternion(0.0f, 0.0f, std::sin(half_angle), std::cos(half_angle));
         }
 
-        static quaternion slerp(const quaternion& a, const quaternion& b, float t) noexcept { return Math::slerp(a, b, t); }
-        static quaternion lerp(const quaternion& a, const quaternion& b, float t) noexcept { return Math::lerp(a, b, t); }
+        static quaternion slerp(const quaternion& a, const quaternion& b, float t) noexcept { return AfterMath::slerp(a, b, t); }
+        static quaternion lerp(const quaternion& a, const quaternion& b, float t) noexcept { return AfterMath::lerp(a, b, t); }
 
         quaternion& operator+=(const quaternion& rhs) noexcept { data_ += rhs.data_; return *this; }
         quaternion& operator-=(const quaternion& rhs) noexcept { data_ -= rhs.data_; return *this; }
@@ -361,7 +361,7 @@ namespace Math
 
         bool is_normalized(float epsilon = Constants::Constants<float>::Epsilon) const noexcept {
             float len_sq = length_sq();
-            return std::isfinite(len_sq) && MathFunctions::approximately(len_sq, 1.0f, epsilon);
+            return std::isfinite(len_sq) && AfterMathFunctions::approximately(len_sq, 1.0f, epsilon);
         }
 
         bool is_valid() const noexcept { return data_.isValid(); }

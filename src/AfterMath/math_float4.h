@@ -26,7 +26,7 @@
 #include "math_float3.h"
 
 ///////////////////////////////////////////////////////////////
-namespace Math
+namespace AfterMath
 {
     // ============================================================================
     // Fwd Declaration
@@ -1348,7 +1348,7 @@ namespace Math
      */
     extern const float4 float4_Magenta;
 
-} // namespace Math
+} // namespace AfterMath
 
 // Include implementation
 #include "math_float4.inl"

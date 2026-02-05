@@ -24,7 +24,7 @@
 #include "math_functions.h"
 #include <iostream>
 
-namespace Math
+namespace AfterMath
 {
     /**
      * @class half
@@ -182,12 +182,12 @@ namespace Math
         // Утилиты
         bool is_valid() const noexcept { return is_finite() || is_inf() || is_nan(); }
         bool approximately(half other, float epsilon = Constants::Constants<float>::Epsilon) const noexcept {
-            return MathFunctions::approximately(float(*this), float(other), epsilon);
+            return AfterMathFunctions::approximately(float(*this), float(other), epsilon);
         }
         bool approximately_zero(float epsilon = Constants::Constants<float>::Epsilon) const noexcept
         {
             float adjusted_epsilon = std::max(epsilon, 1e-3f);
-            return MathFunctions::approximately_zero(float(*this), adjusted_epsilon);
+            return AfterMathFunctions::approximately_zero(float(*this), adjusted_epsilon);
         }
         std::string to_string() const { return std::to_string(float(*this)); }
         half abs() const noexcept { return from_bits(data & 0x7FFF); }
@@ -580,4 +580,4 @@ namespace Math
     inline const half half_Sqrt3(Constants::FloatConstants::Sqrt3);
     inline const half half_GoldenRatio(Constants::FloatConstants::GoldenRatio);
 
-} // namespace Math
+} // namespace AfterMath

@@ -12,7 +12,7 @@
 #include "math_float3.h"
 #include "math_float4.h"
 
-namespace Math
+namespace AfterMath
 {
     class float4x4;
     class quaternion;

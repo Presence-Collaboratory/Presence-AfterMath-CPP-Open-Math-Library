@@ -1,16 +1,16 @@
 // Author: DeepSeek
-// Test suite for Math::float3x3 class
+// Test suite for AfterMath::float3x3 class
 
 #include "AutotestCore.h"
 
-namespace MathTests
+namespace AfterMathTests
 {
     void RunFloat3x3Tests()
     {
         TestSuite suite("Float3x3 Tests", true);
         suite.header();
 
-        using namespace Math;
+        using namespace AfterMath;
 
         // ============================================================================
         // 1. Конструкторы и базовые операции
