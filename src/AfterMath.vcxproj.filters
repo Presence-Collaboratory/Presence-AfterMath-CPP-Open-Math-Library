@@ -46,6 +46,12 @@
     <Filter Include="Math\Include">
       <UniqueIdentifier>{539ea276-2c90-4b21-921a-b5d192bc23d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Autotests\Primitives\Vectors">
+      <UniqueIdentifier>{2ecfb46a-2427-4491-a123-5789f3bc51aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Autotests\Primitives\Vectors\Float">
+      <UniqueIdentifier>{dacad946-e340-40ab-b77d-4db90abcc2cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Autotests\AutotestCore.h">
@@ -113,6 +119,9 @@
     </ClInclude>
     <ClInclude Include="AfterMath\math_functions.h">
       <Filter>Math\Implementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Autotests\autotests_float2.h">
+      <Filter>Autotests\Primitives\Vectors\Float</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

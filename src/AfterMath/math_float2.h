@@ -792,16 +792,6 @@ namespace AfterMath
      */
     float distance_to_line_segment(const float2& point, const float2& line_start, const float2& line_end) noexcept;
 
-    /**
-     * @brief Check if point is inside triangle
-     * @param point Test point
-     * @param a First triangle vertex
-     * @param b Second triangle vertex
-     * @param c Third triangle vertex
-     * @return True if point is inside triangle (including edges)
-     */
-    bool point_in_triangle(const float2& point, const float2& a, const float2& b, const float2& c) noexcept;
-
     // ============================================================================
     // Useful Constants
     // ============================================================================

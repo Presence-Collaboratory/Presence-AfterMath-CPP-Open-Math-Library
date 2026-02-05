@@ -177,6 +177,7 @@
     <ClInclude Include="AfterMath\math_quaternion.h" />
     <ClInclude Include="Autotests\AutotestCore.h" />
     <ClInclude Include="Autotests\autotests_aabb.h" />
+    <ClInclude Include="Autotests\autotests_float2.h" />
     <ClInclude Include="Autotests\autotests_float3x3.h" />
     <ClInclude Include="Autotests\autotests_float4x4.h" />
     <ClInclude Include="Autotests\autotests_quaternion.h" />
