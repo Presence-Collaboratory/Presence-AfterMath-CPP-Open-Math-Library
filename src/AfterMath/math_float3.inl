@@ -138,22 +138,7 @@ namespace AfterMath
     // ============================================================================
 
     inline float float3::length() const noexcept {
-        __m128 v = get_simd();
-        __m128 dp = _mm_dp_ps(v, v, 0x71); // Dot product of x,y,z; store in x
-        // Если SSE4.1 не доступен (_mm_dp_ps), то используем старый метод:
-        // __m128 sq = _mm_mul_ps(v, v);
-        // и горизонтальное сложение.
-        // Для совместимости используем базовый SSE:
-        /*
-        __m128 sq = _mm_mul_ps(v, v);
-        __m128 shuf = _mm_shuffle_ps(sq, sq, _MM_SHUFFLE(0, 0, 2, 1));
-        __m128 sum = _mm_add_ps(sq, shuf);
-        shuf = _mm_shuffle_ps(sum, sum, _MM_SHUFFLE(0, 0, 0, 2));
-        sum = _mm_add_ps(sum, shuf);
-        return _mm_cvtss_f32(_mm_sqrt_ss(sum));
-        */
-        // Но проще и быстрее так, если мы уверены в SSE3+:
-        return std::sqrt(x * x + y * y + z * z); // Компиляторы часто векторизуют это сами лучше, чем ручной код для 3-х компонент
+        return std::sqrt(x * x + y * y + z * z);
     }
 
     inline float float3::length_sq() const noexcept {
@@ -161,25 +146,9 @@ namespace AfterMath
     }
 
     inline float3 float3::normalize() const noexcept {
-        __m128 v = get_simd();
-        __m128 dp = _mm_mul_ps(v, v);
-        // Sum x^2 + y^2 + z^2
-        __m128 t1 = _mm_shuffle_ps(dp, dp, _MM_SHUFFLE(0, 0, 2, 1));
-        __m128 t2 = _mm_add_ps(dp, t1);
-        __m128 t3 = _mm_shuffle_ps(t2, t2, _MM_SHUFFLE(0, 0, 0, 2));
-        __m128 len_sq = _mm_add_ps(t2, t3); // Contains length^2 in all components
-
-        __m128 len = _mm_sqrt_ps(len_sq);
-
-        // Division (with epsilon check handled by logic or rsqrt)
-        // Using standard div for precision
-        __m128 normalized = _mm_div_ps(v, len);
-
-        // Handle zero length case safely by checking mask
-        // Or simpler C++ fallback:
-        float l = length();
-        if (l > Constants::Constants<float>::Epsilon) {
-            return float3(x / l, y / l, z / l);
+        float len = length();
+        if (len > Constants::Constants<float>::Epsilon) {
+            return float3(x / len, y / len, z / len);
         }
         return float3::zero();
     }
@@ -287,9 +256,17 @@ namespace AfterMath
 
     inline float3 float3::refract(const float3& normal, float eta) const noexcept {
         float d = dot(normal);
-        float k = 1.0f - eta * eta * (1.0f - d * d);
-        if (k < 0.0f) return float3::zero();
-        return (*this * eta) - (normal * (eta * d + std::sqrt(k)));
+
+        float cos_theta = AfterMathFunctions::clamp(d, -1.0f, 1.0f);
+
+        float k = 1.0f - eta * eta * (1.0f - cos_theta * cos_theta);
+
+        if (k <= FLT_EPSILON) {
+            return float3::zero();
+        }
+
+        float sqrt_k = std::sqrt(k);
+        return (*this * eta) - (normal * (eta * cos_theta + sqrt_k));
     }
 
     inline float3 float3::project(const float3& onto) const noexcept {
@@ -327,7 +304,6 @@ namespace AfterMath
     }
 
     inline float3 float3::slerp(const float3& a, const float3& b, float t) noexcept {
-        // ... (Same logic as before, just using new operators)
         if (t <= 0.0f) return a;
         if (t >= 1.0f) return b;
 
@@ -427,7 +403,7 @@ namespace AfterMath
     }
 
     inline bool float3::is_normalized(float epsilon) const noexcept {
-        return std::abs(length_sq() - 1.0f) <= epsilon * epsilon;
+        return std::abs(length_sq() - 1.0f) <= epsilon;
     }
 
     inline std::string float3::to_string() const {

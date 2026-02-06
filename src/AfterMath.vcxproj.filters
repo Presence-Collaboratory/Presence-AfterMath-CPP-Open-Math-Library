@@ -123,6 +123,9 @@
     <ClInclude Include="Autotests\autotests_float2.h">
       <Filter>Autotests\Primitives\Vectors\Float</Filter>
     </ClInclude>
+    <ClInclude Include="Autotests\autotests_float3.h">
+      <Filter>Autotests\Primitives\Vectors\Float</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="AfterMath\math_aabb.inl">
