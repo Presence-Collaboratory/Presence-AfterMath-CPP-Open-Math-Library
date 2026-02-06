@@ -346,7 +346,7 @@ namespace AfterMath
             x = std::clamp(x, -1.0f, 1.0f);
 
             // Polynomial approximation for asin in RADIANS
-            // asin(x) ≈ x + x³/6 + 3x⁵/40 + 5x⁷/112
+            // asin(x) approx x + x³/6 + 3x⁵/40 + 5x⁷/112
             const float x2 = x * x;
             const float x3 = x * x2;
             const float x5 = x3 * x2;
@@ -389,7 +389,7 @@ namespace AfterMath
         inline float fast_atan(float x) noexcept
         {
             // Polynomial approximation for atan in RADIANS
-            // atan(x) ≈ x - x³/3 + x⁵/5 - x⁷/7
+            // atan(x) approx x - x³/3 + x⁵/5 - x⁷/7
             const float x2 = x * x;
             const float x3 = x * x2;
             const float x5 = x3 * x2;
@@ -537,21 +537,20 @@ namespace AfterMath
             // Initial approximation using magic number and bit manipulation
             const __m128 three = _mm_set1_ps(3.0f);
             const __m128 half = _mm_set1_ps(0.5f);
-            const __m128 magic = _mm_set1_ps(0x5F3759DF); // Magic number for initial guess
-        
+
             // Convert float to integer, apply magic number, convert back to float
             __m128i integer_representation = _mm_castps_si128(x);
-            integer_representation = _mm_sub_epi32(_mm_set1_epi32(0x5F3759DF), 
-                                                  _mm_srli_epi32(integer_representation, 1));
+            integer_representation = _mm_sub_epi32(_mm_set1_epi32(0x5F3759DF),
+                _mm_srli_epi32(integer_representation, 1));
             __m128 y = _mm_castsi128_ps(integer_representation);
-        
+
             // One iteration of Newton-Raphson for improved accuracy:
             // y = y * (1.5f - (x * 0.5f * y * y))
             __m128 x_half = _mm_mul_ps(x, half);
             __m128 y_squared = _mm_mul_ps(y, y);
             __m128 newton = _mm_sub_ps(three, _mm_mul_ps(x_half, y_squared));
             y = _mm_mul_ps(y, newton);
-        
+
             return y;
         }
 

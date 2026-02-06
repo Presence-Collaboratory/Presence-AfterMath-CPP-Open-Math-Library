@@ -272,7 +272,7 @@ namespace AfterMathTests
             float3 a(1.0f, 0.0f, 0.0f);
             float3 b(0.0f, 1.0f, 0.0f);
             float3 cross_result = a.cross(b);
-            suite.assert_approximately_equal(cross_result, float3(0.0f, 0.0f, 1.0f), "cross() i × j = k");
+            suite.assert_approximately_equal(cross_result, float3(0.0f, 0.0f, 1.0f), "cross() i * j = k");
 
             float3 c(2.0f, 3.0f, 4.0f);
             float3 d(5.0f, 6.0f, 7.0f);
@@ -412,7 +412,7 @@ namespace AfterMathTests
             float eta_water_to_air = 1.33f; // вода → воздух
 
             // Проверим условие полного внутреннего отражения:
-            // Критический угол: θ_c = arcsin(1/eta) = arcsin(1/1.33) ≈ 48.8°
+            // Критический угол: θ_c = arcsin(1/eta) = arcsin(1/1.33) approx 48.8°
             // Угол 60° > 48.8° → должно быть полное внутреннее отражение
 
             float3 incident_large(0.866f, -0.5f, 0.0f); // 60° угол

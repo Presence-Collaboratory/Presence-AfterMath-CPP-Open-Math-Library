@@ -6,6 +6,7 @@
 #include "Autotests/autotests_float4.h"
 
 #include "Autotests/autotests_half.h"
+#include "Autotests/autotests_half2.h"
 
 #include "Autotests/autotests_float2x2.h"
 #include "Autotests/autotests_float3x3.h"
@@ -25,7 +26,8 @@ int main()
     //AfterMathTests::RunFloat3x3Tests();
     //AfterMathTests::RunFloat4x4Tests();
     
-    AfterMathTests::RunHalfTests();
+    //AfterMathTests::RunHalfTests();
+    AfterMathTests::RunHalf2Tests();
 
     //AfterMathTests::RunQuaternionTests();
     

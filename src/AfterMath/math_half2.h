@@ -753,6 +753,70 @@ namespace AfterMath
      */
     half2 operator/(half2 vec, float scalar) noexcept;
 
+    /**
+ * @brief Vector-scalar addition (half)
+ * @param vec Vector to add to
+ * @param scalar Scalar to add
+ * @return Result vector
+ */
+    half2 operator+(half2 vec, half scalar) noexcept;
+
+    /**
+     * @brief Scalar-vector addition (half)
+     * @param scalar Scalar to add
+     * @param vec Vector to add to
+     * @return Result vector
+     */
+    half2 operator+(half scalar, half2 vec) noexcept;
+
+    /**
+     * @brief Vector-scalar subtraction (half)
+     * @param vec Vector to subtract from
+     * @param scalar Scalar to subtract
+     * @return Result vector
+     */
+    half2 operator-(half2 vec, half scalar) noexcept;
+
+    /**
+     * @brief Scalar-vector subtraction (half)
+     * @param scalar Scalar to subtract from
+     * @param vec Vector to subtract
+     * @return Result vector
+     */
+    half2 operator-(half scalar, half2 vec) noexcept;
+
+    /**
+     * @brief Vector-scalar addition (float)
+     * @param vec Vector to add to
+     * @param scalar Scalar to add
+     * @return Result vector
+     */
+    half2 operator+(half2 vec, float scalar) noexcept;
+
+    /**
+     * @brief Scalar-vector addition (float)
+     * @param scalar Scalar to add
+     * @param vec Vector to add to
+     * @return Result vector
+     */
+    half2 operator+(float scalar, half2 vec) noexcept;
+
+    /**
+     * @brief Vector-scalar subtraction (float)
+     * @param vec Vector to subtract from
+     * @param scalar Scalar to subtract
+     * @return Result vector
+     */
+    half2 operator-(half2 vec, float scalar) noexcept;
+
+    /**
+     * @brief Scalar-vector subtraction (float)
+     * @param scalar Scalar to subtract from
+     * @param vec Vector to subtract
+     * @return Result vector
+     */
+    half2 operator-(float scalar, half2 vec) noexcept;
+
     // ============================================================================
     // Mixed Type Operators (half2 <-> float2) (declarations)
     // ============================================================================
@@ -1115,7 +1179,7 @@ namespace AfterMath
     /**
      * @brief Compute angle of vector relative to X-axis
      * @param vec Input vector
-     * @return Angle in radians between [-π, π]
+     * @return Angle in radians between [-pi, pi]
      */
     half angle(const half2& vec) noexcept;
 
@@ -1123,7 +1187,7 @@ namespace AfterMath
      * @brief Compute angle between two vectors in radians
      * @param a First vector
      * @param b Second vector
-     * @return Angle in radians between [0, π]
+     * @return Angle in radians between [0, pi]
      */
     half angle_between(const half2& a, const half2& b) noexcept;
 

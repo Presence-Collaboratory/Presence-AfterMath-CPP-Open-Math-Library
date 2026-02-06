@@ -403,7 +403,7 @@ namespace AfterMath
 
         /**
          * @brief Get angle of vector in radians
-         * @return Angle from positive x-axis in range [-π, π]
+         * @return Angle from positive x-axis in range [-pi, pi]
          */
         float angle() const noexcept;
 
@@ -656,7 +656,7 @@ namespace AfterMath
      * @brief Compute angle between two vectors in radians
      * @param a First vector
      * @param b Second vector
-     * @return Angle in radians between [0, π]
+     * @return Angle in radians between [0, pi]
      */
     float angle_between(const float2& a, const float2& b) noexcept;
 
@@ -664,7 +664,7 @@ namespace AfterMath
      * @brief Compute signed angle between two vectors
      * @param from Starting vector
      * @param to Target vector
-     * @return Signed angle in radians between [-π, π]
+     * @return Signed angle in radians between [-pi, pi]
      */
     float signed_angle_between(const float2& from, const float2& to) noexcept;
 

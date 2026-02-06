@@ -361,8 +361,8 @@ namespace AfterMathTests
             suite.assert_approximately_equal(refracted2, expected2, "refract() with eta=0.5");
 
             // Тест полного внутреннего отражения: ВОДА→ВОЗДУХ
-            // n1 = 1.33 (вода), n2 = 1.0 (воздух), eta = n2/n1 = 1.0/1.33 ≈ 0.7519
-            // Критический угол: θ_c = arcsin(eta) = arcsin(0.7519) ≈ 48.8°
+            // n1 = 1.33 (вода), n2 = 1.0 (воздух), eta = n2/n1 = 1.0/1.33 approx 0.7519
+            // Критический угол: θ_c = arcsin(eta) = arcsin(0.7519) approx 48.8°
             // Берем угол падения 60° > 48.8° - должно быть полное внутреннее отражение
 
             float angle = Constants::Constants<float>::Pi / 3.0f; // 60°
@@ -707,7 +707,7 @@ namespace AfterMathTests
             // Точка ближе к началу отрезка
             float2 point3(0.0f, 2.0f);
             float distance3 = distance_to_line_segment(point3, line_start, line_end);
-            // Расстояние до начальной точки (1,0): √((0-1)² + (2-0)²) = √(1 + 4) = √5 ≈ 2.236
+            // Расстояние до начальной точки (1,0): √((0-1)² + (2-0)²) = √(1 + 4) = √5 approx 2.236
             suite.assert_approximately_equal(distance3, std::sqrt(5.0f), "distance_to_line_segment() closest to start");
         }
 

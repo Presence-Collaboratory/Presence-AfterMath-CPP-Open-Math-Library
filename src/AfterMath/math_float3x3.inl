@@ -441,7 +441,7 @@ namespace AfterMath
 
     inline float3x3 float3x3::skew_symmetric(const float3& vec) noexcept
     {
-        // [v]× * w = cross(v, w)
+        // [v]* * w = cross(v, w)
         return float3x3(
             float3(0.0f, -vec.z, vec.y),
             float3(vec.z, 0.0f, -vec.x),

@@ -177,21 +177,30 @@ namespace AfterMath {
 
     inline half half2::length() const noexcept
     {
-        return sqrt(length_sq());
+        // Используем float для вычисления длины, чтобы избежать переполнения
+        float fx = float(x);
+        float fy = float(y);
+        return half(std::sqrt(fx * fx + fy * fy));
     }
 
     inline half half2::length_sq() const noexcept
     {
+        // Для очень больших значений может произойти переполнение,
+        // но это ожидаемое поведение для half
         return x * x + y * y;
     }
 
     inline half2 half2::normalize() const noexcept
     {
-        half len = length();
-        if (len.is_zero() || !len.is_finite()) {
+        float fx = float(x);
+        float fy = float(y);
+        float len = std::sqrt(fx * fx + fy * fy);
+
+        if (len == 0.0f || !std::isfinite(len)) {
             return half2::zero();
         }
-        return half2(x / len, y / len);
+
+        return half2(fx / len, fy / len);
     }
 
     inline half half2::dot(const half2& other) const noexcept
@@ -230,17 +239,20 @@ namespace AfterMath {
 
     inline half2 half2::floor() const noexcept
     {
-        return half2(AfterMath::floor(x), AfterMath::floor(y));
+        return half2(half(std::floor(float(x))),
+            half(std::floor(float(y))));
     }
 
     inline half2 half2::ceil() const noexcept
     {
-        return half2(AfterMath::ceil(x), AfterMath::ceil(y));
+        return half2(half(std::ceil(float(x))),
+            half(std::ceil(float(y))));
     }
 
     inline half2 half2::round() const noexcept
     {
-        return half2(AfterMath::round(x), AfterMath::round(y));
+        return half2(half(std::round(float(x))),
+            half(std::round(float(y))));
     }
 
     inline half2 half2::frac() const noexcept
@@ -455,6 +467,50 @@ namespace AfterMath {
     inline half2 operator/(half2 vec, float scalar) noexcept
     {
         return vec /= scalar;
+    }
+
+    // ============================================================================
+    // Scalar Operations Implementation
+    // ============================================================================
+
+    inline half2 operator+(half2 vec, half scalar) noexcept
+    {
+        return half2(vec.x + scalar, vec.y + scalar);
+    }
+
+    inline half2 operator+(half scalar, half2 vec) noexcept
+    {
+        return half2(scalar + vec.x, scalar + vec.y);
+    }
+
+    inline half2 operator-(half2 vec, half scalar) noexcept
+    {
+        return half2(vec.x - scalar, vec.y - scalar);
+    }
+
+    inline half2 operator-(half scalar, half2 vec) noexcept
+    {
+        return half2(scalar - vec.x, scalar - vec.y);
+    }
+
+    inline half2 operator+(half2 vec, float scalar) noexcept
+    {
+        return half2(vec.x + scalar, vec.y + scalar);
+    }
+
+    inline half2 operator+(float scalar, half2 vec) noexcept
+    {
+        return half2(scalar + vec.x, scalar + vec.y);
+    }
+
+    inline half2 operator-(half2 vec, float scalar) noexcept
+    {
+        return half2(vec.x - scalar, vec.y - scalar);
+    }
+
+    inline half2 operator-(float scalar, half2 vec) noexcept
+    {
+        return half2(scalar - vec.x, scalar - vec.y);
     }
 
     // ============================================================================

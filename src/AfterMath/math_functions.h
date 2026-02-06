@@ -194,7 +194,7 @@ namespace AfterMath
          * @param a First angle in radians
          * @param b Second angle in radians
          * @param epsilon Angular tolerance in radians
-         * @return True if angles are approximately equal modulo 2π
+         * @return True if angles are approximately equal modulo 2pi
          */
         inline bool approximately_angle(float a, float b, float epsilon = Constants::Constants<float>::Epsilon) noexcept {
             float diff = std::abs(a - b);
@@ -386,7 +386,7 @@ namespace AfterMath
         }
 
         inline float normalize_angle(float angle) {
-            // Приводим угол к диапазону [-π, π]
+            // Приводим угол к диапазону [-pi, pi]
             while (angle > Constants::PI) angle -= Constants::TWO_PI;
             while (angle < -Constants::PI) angle += Constants::TWO_PI;
             return angle;

@@ -49,28 +49,28 @@ namespace AfterMath
         struct Constants<float> {
             static_assert(std::is_floating_point_v<float>, "T must be a floating-point type");
 
-            /// @brief π (pi) constant - ratio of circle's circumference to its diameter
+            /// @brief pi (pi) constant - ratio of circle's circumference to its diameter
             static constexpr float Pi = 3.14159265358979323846f;
 
-            /// @brief 2π (tau) constant - full circle in radians
+            /// @brief 2pi (tau) constant - full circle in radians
             static constexpr float TwoPi = 6.28318530717958647692f;
 
-            /// @brief π/2 constant - right angle in radians
+            /// @brief pi/2 constant - right angle in radians
             static constexpr float HalfPi = 1.57079632679489661923f;
 
-            /// @brief 1/π constant - reciprocal of pi
+            /// @brief 1/pi constant - reciprocal of pi
             static constexpr float InvPi = 0.31830988618379067154f;
 
-            /// @brief 1/(2π) constant - reciprocal of tau
+            /// @brief 1/(2pi) constant - reciprocal of tau
             static constexpr float InvTwoPi = 0.15915494309189533577f;
 
-            /// @brief π/4 constant - 45 degrees in radians
+            /// @brief pi/4 constant - 45 degrees in radians
             static constexpr float QuarterPi = 0.78539816339744830962f;
 
-            /// @brief Conversion factor from degrees to radians (π/180)
+            /// @brief Conversion factor from degrees to radians (pi/180)
             static constexpr float DegToRad = Pi / 180.0f;
 
-            /// @brief Conversion factor from radians to degrees (180/π)
+            /// @brief Conversion factor from radians to degrees (180/pi)
             static constexpr float RadToDeg = 180.0f / Pi;
 
             /// @brief Machine epsilon for float comparisons (1e-6f)
@@ -112,22 +112,22 @@ namespace AfterMath
         struct Constants<double> {
             static_assert(std::is_floating_point_v<double>, "T must be a floating-point type");
 
-            /// @brief π (pi) constant with double precision
+            /// @brief pi (pi) constant with double precision
             static constexpr double Pi = 3.14159265358979323846;
 
-            /// @brief 2π (tau) constant with double precision
+            /// @brief 2pi (tau) constant with double precision
             static constexpr double TwoPi = 6.28318530717958647692;
 
-            /// @brief π/2 constant with double precision
+            /// @brief pi/2 constant with double precision
             static constexpr double HalfPi = 1.57079632679489661923;
 
-            /// @brief 1/π constant with double precision
+            /// @brief 1/pi constant with double precision
             static constexpr double InvPi = 0.31830988618379067154;
 
-            /// @brief 1/(2π) constant with double precision
+            /// @brief 1/(2pi) constant with double precision
             static constexpr double InvTwoPi = 0.15915494309189533577;
 
-            /// @brief π/4 constant with double precision
+            /// @brief pi/4 constant with double precision
             static constexpr double QuarterPi = 0.78539816339744830962;
 
             /// @brief Conversion factor from degrees to radians with double precision
@@ -178,22 +178,22 @@ namespace AfterMath
         // Convenience Constants (Float Precision)
         // ============================================================================
 
-        /// @brief π constant with float precision
+        /// @brief pi constant with float precision
         constexpr float PI = FloatConstants::Pi;
 
-        /// @brief 2π constant with float precision
+        /// @brief 2pi constant with float precision
         constexpr float TWO_PI = FloatConstants::TwoPi;
 
-        /// @brief π/2 constant with float precision  
+        /// @brief pi/2 constant with float precision  
         constexpr float HALF_PI = FloatConstants::HalfPi;
 
-        /// @brief π/4 constant with float precision
+        /// @brief pi/4 constant with float precision
         constexpr float QUARTER_PI = FloatConstants::QuarterPi;
 
-        /// @brief 1/π constant with float precision
+        /// @brief 1/pi constant with float precision
         constexpr float INV_PI = FloatConstants::InvPi;
 
-        /// @brief 1/(2π) constant with float precision
+        /// @brief 1/(2pi) constant with float precision
         constexpr float INV_TWO_PI = FloatConstants::InvTwoPi;
 
         /// @brief Degrees to radians conversion factor

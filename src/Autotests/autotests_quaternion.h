@@ -465,13 +465,13 @@ namespace AfterMathTests
             suite.assert_approximately_equal(slerp(a, b, 1.0f), b, "SLERP at t=1");
         }
 
-        // SLERP ≈ NLERP для малых углов
+        // SLERP approx NLERP для малых углов
         {
             quaternion a = quaternion::rotation_x(0.1f);
             quaternion b = quaternion::rotation_x(0.2f);
             quaternion s = slerp(a, b, 0.5f);
             quaternion n = nlerp(a, b, 0.5f);
-            suite.assert_approximately_equal(s, n, "SLERP ≈ NLERP for small angles", 1e-3f);
+            suite.assert_approximately_equal(s, n, "SLERP approx NLERP for small angles", 1e-3f);
         }
 
         // ============================================================================

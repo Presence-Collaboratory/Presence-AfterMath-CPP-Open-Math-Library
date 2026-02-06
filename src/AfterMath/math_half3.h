@@ -1259,7 +1259,7 @@ namespace AfterMath
      * @brief Compute angle between two vectors in radians
      * @param a First vector
      * @param b Second vector
-     * @return Angle in radians between [0, π]
+     * @return Angle in radians between [0, pi]
      */
     half angle_between(const half3& a, const half3& b) noexcept;
 

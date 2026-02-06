@@ -272,7 +272,7 @@ namespace AfterMathTests
         // Тест длины
         {
             float4 v(2.0f, 3.0f, 6.0f, 8.0f);
-            // √(4 + 9 + 36 + 64) = √113 ≈ 10.6301
+            // √(4 + 9 + 36 + 64) = √113 approx 10.6301
             float expected_length = std::sqrt(113.0f);
             suite.assert_approximately_equal(v.length(), expected_length, "length()", 1e-6f);
             suite.assert_approximately_equal(v.length_sq(), 113.0f, "length_sq()");
@@ -328,7 +328,7 @@ namespace AfterMathTests
             float4 a(1.0f, 0.0f, 0.0f, 0.0f);
             float4 b(0.0f, 1.0f, 0.0f, 0.0f);
             float4 cross_result = a.cross(b);
-            suite.assert_approximately_equal(cross_result, float4(0.0f, 0.0f, 1.0f, 0.0f), "cross() i × j = k");
+            suite.assert_approximately_equal(cross_result, float4(0.0f, 0.0f, 1.0f, 0.0f), "cross() i * j = k");
 
             float4 c(2.0f, 3.0f, 4.0f, 5.0f);
             float4 d(5.0f, 6.0f, 7.0f, 8.0f);

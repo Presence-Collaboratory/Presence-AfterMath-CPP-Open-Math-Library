@@ -678,7 +678,7 @@ namespace AfterMathTests
         // Вращение на 360 градусов
         {
             float2x2 rot360 = float2x2::rotation(2.0f * Constants::Constants<float>::Pi);
-            suite.assert_true(rot360.is_identity(1e-5f), "rotation(2π) returns identity");
+            suite.assert_true(rot360.is_identity(1e-5f), "rotation(2pi) returns identity");
         }
 
         // Деление на ноль

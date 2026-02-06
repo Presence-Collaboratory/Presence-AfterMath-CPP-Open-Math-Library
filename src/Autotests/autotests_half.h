@@ -629,15 +629,15 @@ namespace AfterMathTests
             half h(2.0f);
             double d = 3.0;
 
-            suite.assert_approximately_equal(double(h + d), 5.0, "half + double", 1e-3);
-            suite.assert_approximately_equal(double(h - d), -1.0, "half - double", 1e-3);
-            suite.assert_approximately_equal(double(h * d), 6.0, "half * double", 1e-3);
-            suite.assert_approximately_equal(double(h / d), 2.0 / 3.0, "half / double", 1e-3);
+            suite.assert_approximately_equal(float(h + d), 5.0f, "half + double", 0.002f);
+            suite.assert_approximately_equal(float(h - d), -1.0f, "half - double", 0.002f);
+            suite.assert_approximately_equal(float(h * d), 6.0f, "half * double", 0.002f);
+            suite.assert_approximately_equal(float(h / d), 2.0f / 3.0f, "half / double", 0.002f);
 
-            suite.assert_approximately_equal(double(d + h), 5.0, "double + half", 1e-3);
-            suite.assert_approximately_equal(double(d - h), 1.0, "double - half", 1e-3);
-            suite.assert_approximately_equal(double(d * h), 6.0, "double * half", 1e-3);
-            suite.assert_approximately_equal(double(d / h), 1.5, "double / half", 1e-3);
+            suite.assert_approximately_equal(float(d + h), 5.0f, "double + half", 0.002f);
+            suite.assert_approximately_equal(float(d - h), 1.0f, "double - half", 0.002f);
+            suite.assert_approximately_equal(float(d * h), 6.0f, "double * half", 0.002f);
+            suite.assert_approximately_equal(float(d / h), 1.5f, "double / half", 0.002f);
         }
 
         // Операции с int
