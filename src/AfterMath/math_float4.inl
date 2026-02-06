@@ -234,33 +234,15 @@ namespace AfterMath
     }
 
     inline float4 float4::floor() const noexcept {
-#ifdef __SSE4_1__
         return float4(_mm_floor_ps(simd_));
-#else
-        alignas(16) float temp[4];
-        _mm_store_ps(temp, simd_);
-        return float4(std::floor(temp[0]), std::floor(temp[1]), std::floor(temp[2]), std::floor(temp[3]));
-#endif
     }
 
     inline float4 float4::ceil() const noexcept {
-#ifdef __SSE4_1__
         return float4(_mm_ceil_ps(simd_));
-#else
-        alignas(16) float temp[4];
-        _mm_store_ps(temp, simd_);
-        return float4(std::ceil(temp[0]), std::ceil(temp[1]), std::ceil(temp[2]), std::ceil(temp[3]));
-#endif
     }
 
     inline float4 float4::round() const noexcept {
-#ifdef __SSE4_1__
         return float4(_mm_round_ps(simd_, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
-#else
-        alignas(16) float temp[4];
-        _mm_store_ps(temp, simd_);
-        return float4(std::round(temp[0]), std::round(temp[1]), std::round(temp[2]), std::round(temp[3]));
-#endif
     }
 
     inline float4 float4::frac() const noexcept {
@@ -300,8 +282,13 @@ namespace AfterMath
     }
 
     inline float float4::brightness() const noexcept {
-        __m128 sum = _mm_hadd_ps(simd_, simd_);
+        // Обнуляем w компонент перед вычислением
+        __m128 rgb = _mm_and_ps(simd_, _mm_castsi128_ps(_mm_set_epi32(0, ~0, ~0, ~0)));
+
+        __m128 sum = _mm_hadd_ps(rgb, rgb);
         sum = _mm_hadd_ps(sum, sum);
+
+        // Делим на 3 (только RGB компоненты)
         return _mm_cvtss_f32(_mm_mul_ss(sum, _mm_set1_ps(1.0f / 3.0f)));
     }
 
@@ -346,11 +333,18 @@ namespace AfterMath
 
     inline float3 float4::project() const noexcept {
         __m128 w_vec = _mm_shuffle_ps(simd_, simd_, _MM_SHUFFLE(3, 3, 3, 3));
-        __m128 mask = _mm_cmpneq_ps(w_vec, _mm_setzero_ps());
-        __m128 inv_w = _mm_div_ps(_mm_set1_ps(1.0f), w_vec);
-        inv_w = _mm_and_ps(inv_w, mask);
 
+        __m128 epsilon = _mm_set1_ps(Constants::Constants<float>::Epsilon);
+        __m128 abs_w = _mm_andnot_ps(_mm_set1_ps(-0.0f), w_vec);
+        __m128 mask = _mm_cmpgt_ps(abs_w, epsilon);
+
+        if (_mm_movemask_ps(mask) == 0) {
+            return float3::zero();
+        }
+
+        __m128 inv_w = _mm_div_ps(_mm_set1_ps(1.0f), w_vec);
         __m128 projected = _mm_mul_ps(simd_, inv_w);
+
         return float3(_mm_cvtss_f32(projected),
             _mm_cvtss_f32(_mm_shuffle_ps(projected, projected, _MM_SHUFFLE(1, 1, 1, 1))),
             _mm_cvtss_f32(_mm_shuffle_ps(projected, projected, _MM_SHUFFLE(2, 2, 2, 2))));
@@ -421,6 +415,8 @@ namespace AfterMath
     }
 
     inline float4 float4::lerp(const float4& a, const float4& b, float t) noexcept {
+        t = AfterMathFunctions::clamp(t, 0.0f, 1.0f);
+
         __m128 t_vec = _mm_set1_ps(t);
         __m128 one_minus_t = _mm_set1_ps(1.0f - t);
 

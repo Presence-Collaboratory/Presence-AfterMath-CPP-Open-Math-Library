@@ -180,6 +180,7 @@
     <ClInclude Include="Autotests\autotests_float2.h" />
     <ClInclude Include="Autotests\autotests_float3.h" />
     <ClInclude Include="Autotests\autotests_float3x3.h" />
+    <ClInclude Include="Autotests\autotests_float4.h" />
     <ClInclude Include="Autotests\autotests_float4x4.h" />
     <ClInclude Include="Autotests\autotests_quaternion.h" />
   </ItemGroup>
