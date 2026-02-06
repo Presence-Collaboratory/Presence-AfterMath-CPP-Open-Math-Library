@@ -183,6 +183,7 @@
     <ClInclude Include="Autotests\autotests_float3x3.h" />
     <ClInclude Include="Autotests\autotests_float4.h" />
     <ClInclude Include="Autotests\autotests_float4x4.h" />
+    <ClInclude Include="Autotests\autotests_half.h" />
     <ClInclude Include="Autotests\autotests_quaternion.h" />
   </ItemGroup>
   <ItemGroup>

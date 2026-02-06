@@ -52,6 +52,9 @@
     <Filter Include="Autotests\Primitives\Vectors\Float">
       <UniqueIdentifier>{dacad946-e340-40ab-b77d-4db90abcc2cb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Autotests\Primitives\Vectors\Half">
+      <UniqueIdentifier>{095d0656-45e0-4e1d-afac-6e04396b6305}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Autotests\AutotestCore.h">
@@ -131,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="Autotests\autotests_float2x2.h">
       <Filter>Autotests\Primitives\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="Autotests\autotests_half.h">
+      <Filter>Autotests\Primitives\Vectors\Half</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

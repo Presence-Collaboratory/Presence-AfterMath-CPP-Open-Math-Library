@@ -48,6 +48,7 @@ namespace AfterMath
         // Конструкторы
         half() noexcept : data(0) {}
         half(float x) noexcept { data = float_to_half_correct(x); }
+        half(double x) noexcept { data = float_to_half_correct(float(x)); }
         explicit half(storage_type bits) noexcept : data(bits) {}
         half(const half&) noexcept = default;
 
@@ -111,7 +112,7 @@ namespace AfterMath
         /**
          * @brief Check if value is zero (positive or negative)
          */
-        bool is_zero() const noexcept 
+        bool is_zero() const noexcept
         {
             return (bits() & 0x7FFF) == 0;
         }
@@ -130,8 +131,10 @@ namespace AfterMath
         }
 
         bool is_nan() const noexcept {
-            // NaN: экспонента все 1, мантисса не 0
-            return ((data & 0x7C00) == 0x7C00) && ((data & 0x03FF) != 0);
+            // NaN: экспонента = 31 (все 1) и мантисса ≠ 0
+            uint16_t exp = (data >> 10) & 0x1F;
+            uint16_t mant = data & 0x03FF;
+            return (exp == 31) && (mant != 0);
         }
 
         bool is_inf() const noexcept {
@@ -197,7 +200,11 @@ namespace AfterMath
         static half infinity() noexcept { return half(std::numeric_limits<float>::infinity()); }
         static half negative_infinity() noexcept { return half(-std::numeric_limits<float>::infinity()); }
         static half quiet_nan() noexcept { return half(std::numeric_limits<float>::quiet_NaN()); }
-        static half signaling_nan() noexcept { return half(0x7D00); }
+        static half signaling_nan() noexcept {
+            // IEEE 754-2008: signaling NaN имеет старший бит мантиссы = 0
+            // Для half: бит 9 мантиссы = 0 для signaling NaN
+            return from_bits(0x7D00); // Мантисса = 0x0100 (бит 9 = 0)
+        }
         static half max_value() noexcept { return half(0x7BFF); }
         static half min_value() noexcept { return half(0x0400); }
         static half min_denormal_value() noexcept { return half(0x0001); }
@@ -272,7 +279,7 @@ namespace AfterMath
         storage_type data;
 
         // Корректная конвертация float -> half
-        static storage_type float_to_half_correct(float f) noexcept 
+        static storage_type float_to_half_correct(float f) noexcept
         {
             // Обработка специальных значений с использованием стандартной библиотеки
             if (std::isnan(f)) {
@@ -489,7 +496,10 @@ namespace AfterMath
     inline half ceil(half x) noexcept { return half(std::ceil(float(x))); }
     inline half round(half x) noexcept { return half(std::round(float(x))); }
     inline half trunc(half x) noexcept { return half(std::trunc(float(x))); }
-    inline half frac(half x) noexcept { float f = float(x); return half(f - std::floor(f)); }
+    inline half frac(half x) noexcept {
+        float f = float(x);
+        return half(f - std::floor(f));
+    }
     inline half fmod(half x, half y) noexcept { return half(std::fmod(float(x), float(y))); }
     inline half modf(half x, half* intpart) noexcept {
         float intpart_f;
