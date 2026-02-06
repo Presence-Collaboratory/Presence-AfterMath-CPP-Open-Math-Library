@@ -1,3 +1,4 @@
+﻿#include "math_float2x2.h"
 #ifndef MATH_FLOAT2X2_INL
 #define MATH_FLOAT2X2_INL
 
@@ -26,6 +27,12 @@ namespace AfterMath
     inline float2x2 operator/(float2x2 mat, float scalar) noexcept
     {
         return mat /= scalar;
+    }
+
+    // Добавим оператор умножения матрицы на вектор
+    inline float2 operator*(const float2x2& mat, const float2& vec) noexcept
+    {
+        return mat.transform_vector(vec);
     }
 
     inline float2 operator*(const float2& vec, const float2x2& mat) noexcept
@@ -317,41 +324,96 @@ namespace AfterMath
         return transform_vector(point);
     }
 
+    inline bool float2x2::is_orthonormal(float epsilon) const noexcept
+    {
+        float2 c0 = col0();
+        float2 c1 = col1();
+
+        return std::abs(c0.length_sq() - 1.0f) <= epsilon &&
+            std::abs(c1.length_sq() - 1.0f) <= epsilon &&
+            std::abs(AfterMath::dot(c0, c1)) <= epsilon;
+    }
+
     inline float float2x2::get_rotation() const noexcept
     {
-        if (!is_rotation()) {
+        float2 c0 = col0();
+        float2 c1 = col1();
+
+        float len0 = c0.length();
+        float len1 = c1.length();
+
+        // Если столбцы имеют нулевую длину, вращения нет
+        if (len0 < Constants::Constants<float>::Epsilon || len1 < Constants::Constants<float>::Epsilon) {
             return 0.0f;
         }
 
-        return std::atan2(row1_.x, row0_.x);
+        // Нормализуем столбцы
+        float2 v0 = c0 / len0;
+        float2 v1 = c1 / len1;
+
+        // Проверяем, что столбцы ортогональны (их скалярное произведение близко к 0)
+        // Это необходимо, чтобы матрица была комбинацией вращения и масштаба (без сдвига)
+        if (std::abs(AfterMath::dot(v0, v1)) > Constants::Constants<float>::Epsilon) {
+            return 0.0f;
+        }
+
+        // Извлекаем угол из первого нормализованного столбца
+        float angle = std::atan2(v0.y, v0.x);
+
+        // Нормализуем угол
+        if (angle > Constants::Constants<float>::Pi) {
+            angle -= 2.0f * Constants::Constants<float>::Pi;
+        }
+        else if (angle <= -Constants::Constants<float>::Pi) {
+            angle += 2.0f * Constants::Constants<float>::Pi;
+        }
+
+        return angle;
     }
 
     inline float2 float2x2::get_scale() const noexcept
     {
-        return float2(col0().length(), col1().length());
+        float2 col0 = this->col0();
+        float2 col1 = this->col1();
+        return float2(col0.length(), col1.length());
     }
 
     inline void float2x2::set_rotation(float angle) noexcept
     {
+        // Сохраняем текущий масштаб
         float2 current_scale = get_scale();
-        bool has_reflection = determinant() < 0.0f;
 
+        // Создаем матрицу чистого поворота
         float s, c;
         AfterMathFunctions::sin_cos(angle, &s, &c);
 
-        if (has_reflection) {
-            s = -s;
-        }
+        // Применяем поворот с сохранением масштаба
+        // Для матрицы с отражением (отрицательный детерминант) нужно инвертировать знак масштаба
+        float det_sign = (determinant() < 0.0f) ? -1.0f : 1.0f;
 
-        set_row0(float2(c, -s) * current_scale.x);
-        set_row1(float2(s, c) * current_scale.y);
+        set_col0(float2(c, s) * current_scale.x);
+        set_col1(float2(-s * det_sign, c * det_sign) * current_scale.y);
     }
 
     inline void float2x2::set_scale(const float2& scale) noexcept
     {
-        float2 current_scale = get_scale();
-        if (current_scale.x > 0) set_col0(col0() * (scale.x / current_scale.x));
-        if (current_scale.y > 0) set_col1(col1() * (scale.y / current_scale.y));
+        // Получаем текущие столбцы
+        float2 c0 = col0();
+        float2 c1 = col1();
+
+        // Нормализуем текущие столбцы (получаем направление без масштаба)
+        float len0 = c0.length();
+        float len1 = c1.length();
+
+        if (len0 > Constants::Constants<float>::Epsilon && len1 > Constants::Constants<float>::Epsilon) {
+            // Применяем новый масштаб к нормализованным направлениям
+            set_col0(c0 * (scale.x / len0));
+            set_col1(c1 * (scale.y / len1));
+        }
+        else {
+            // Если текущая матрица вырождена, создаем диагональную матрицу масштаба
+            *this = float2x2::scaling(scale);
+        }
     }
 
     inline bool float2x2::is_identity(float epsilon) const noexcept
@@ -424,30 +486,28 @@ namespace AfterMath
 
     inline float2x2 operator*(const float2x2& lhs, const float2x2& rhs) noexcept
     {
-        __m128 lhs_data = lhs.sse_data();
-        __m128 rhs_data = rhs.sse_data();
+        __m128 lhs_data = lhs.sse_data();  // [m00, m01, m10, m11]
+        __m128 rhs_data = rhs.sse_data();  // [n00, n01, n10, n11]
 
-        __m128 rhs_row0 = _mm_shuffle_ps(rhs_data, rhs_data, _MM_SHUFFLE(0, 0, 0, 0));
-        __m128 lhs_swizzled0 = _mm_shuffle_ps(lhs_data, lhs_data, _MM_SHUFFLE(0, 0, 1, 1));
-        __m128 part0 = _mm_mul_ps(lhs_swizzled0, rhs_row0);
+        // Вычисляем первую строку: [m00*n00 + m01*n10, m00*n01 + m01*n11]
+        // Вычисляем вторую строку: [m10*n00 + m11*n10, m10*n01 + m11*n11]
 
-        __m128 rhs_row0_second = _mm_shuffle_ps(rhs_data, rhs_data, _MM_SHUFFLE(1, 1, 1, 1));
-        __m128 lhs_swizzled1 = _mm_shuffle_ps(lhs_data, lhs_data, _MM_SHUFFLE(2, 2, 3, 3));
-        __m128 part1 = _mm_mul_ps(lhs_swizzled1, rhs_row0_second);
+        float m00 = _mm_cvtss_f32(lhs_data);  // lhs(0,0)
+        float m01 = _mm_cvtss_f32(_mm_shuffle_ps(lhs_data, lhs_data, _MM_SHUFFLE(1, 1, 1, 1)));  // lhs(0,1)
+        float m10 = _mm_cvtss_f32(_mm_shuffle_ps(lhs_data, lhs_data, _MM_SHUFFLE(2, 2, 2, 2)));  // lhs(1,0)
+        float m11 = _mm_cvtss_f32(_mm_shuffle_ps(lhs_data, lhs_data, _MM_SHUFFLE(3, 3, 3, 3)));  // lhs(1,1)
 
-        __m128 result_row0 = _mm_add_ps(part0, part1);
+        float n00 = _mm_cvtss_f32(rhs_data);  // rhs(0,0)
+        float n01 = _mm_cvtss_f32(_mm_shuffle_ps(rhs_data, rhs_data, _MM_SHUFFLE(1, 1, 1, 1)));  // rhs(0,1)
+        float n10 = _mm_cvtss_f32(_mm_shuffle_ps(rhs_data, rhs_data, _MM_SHUFFLE(2, 2, 2, 2)));  // rhs(1,0)
+        float n11 = _mm_cvtss_f32(_mm_shuffle_ps(rhs_data, rhs_data, _MM_SHUFFLE(3, 3, 3, 3)));  // rhs(1,1)
 
-        __m128 rhs_row1 = _mm_shuffle_ps(rhs_data, rhs_data, _MM_SHUFFLE(2, 2, 2, 2));
-        __m128 part2 = _mm_mul_ps(lhs_swizzled0, rhs_row1);
+        float r00 = m00 * n00 + m01 * n10;
+        float r01 = m00 * n01 + m01 * n11;
+        float r10 = m10 * n00 + m11 * n10;
+        float r11 = m10 * n01 + m11 * n11;
 
-        __m128 rhs_row1_second = _mm_shuffle_ps(rhs_data, rhs_data, _MM_SHUFFLE(3, 3, 3, 3));
-        __m128 part3 = _mm_mul_ps(lhs_swizzled1, rhs_row1_second);
-
-        __m128 result_row1 = _mm_add_ps(part2, part3);
-
-        __m128 result = _mm_shuffle_ps(result_row0, result_row1, _MM_SHUFFLE(2, 0, 2, 0));
-
-        return float2x2(result);
+        return float2x2(r00, r01, r10, r11);
     }
 
     inline const float2x2 float2x2_Identity = float2x2::identity();

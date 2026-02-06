@@ -178,6 +178,7 @@
     <ClInclude Include="Autotests\AutotestCore.h" />
     <ClInclude Include="Autotests\autotests_aabb.h" />
     <ClInclude Include="Autotests\autotests_float2.h" />
+    <ClInclude Include="Autotests\autotests_float2x2.h" />
     <ClInclude Include="Autotests\autotests_float3.h" />
     <ClInclude Include="Autotests\autotests_float3x3.h" />
     <ClInclude Include="Autotests\autotests_float4.h" />

@@ -77,6 +77,8 @@ namespace AfterMath
         float2 transform_vector(const float2& vec) const noexcept;
         float2 transform_point(const float2& point) const noexcept;
 
+        bool is_orthonormal(float epsilon = Constants::EPSILON) const noexcept;
+
         float get_rotation() const noexcept;
         float2 get_scale() const noexcept;
         void set_rotation(float angle) noexcept;
@@ -101,6 +103,9 @@ namespace AfterMath
     float2x2 operator*(float2x2 mat, float scalar) noexcept;
     float2x2 operator*(float scalar, float2x2 mat) noexcept;
     float2x2 operator/(float2x2 mat, float scalar) noexcept;
+
+    // Два оператора умножения: матрица на вектор и вектор на матрицу
+    float2 operator*(const float2x2& mat, const float2& vec) noexcept;
     float2 operator*(const float2& vec, const float2x2& mat) noexcept;
 
     float2x2 transpose(const float2x2& mat) noexcept;
@@ -118,10 +123,6 @@ namespace AfterMath
         float epsilon = Constants::Constants<float>::Epsilon) noexcept;
     bool is_rotation(const float2x2& mat,
         float epsilon = Constants::Constants<float>::Epsilon) noexcept;
-
-    extern const float2x2 float2x2_Identity;
-    extern const float2x2 float2x2_Zero;
-
 }
 
 #include "math_float2x2.inl"
