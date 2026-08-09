@@ -4,7 +4,10 @@
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
   <img src="https://img.shields.io/badge/C%2B%2B-23-blue" alt="C++ Standard">
   <a href="https://github.com/Presence-Collaboratory/AfterMath-CPP-Open-Math-Library/actions/workflows/build.yml">
-    <img src="https://github.com/Presence-Collaboratory/AfterMath-CPP-Open-Math-Library/actions/workflows/build.yml/badge.svg" alt="Build Status">
+      <img src="https://github.com/Presence-Collaboratory/AfterMath-CPP-Open-Math-Library/actions/workflows/build.yml/badge.svg" alt="Build Status">
+  </a>
+  <a href="https://github.com/Presence-Collaboratory/AfterMath-CPP-Open-Math-Library/actions/workflows/test.yml">
+      <img src="https://github.com/Presence-Collaboratory/AfterMath-CPP-Open-Math-Library/actions/workflows/test.yml/badge.svg" alt="Test Status">
   </a>
   <a href="https://github.com/Presence-Collaboratory/AfterMath-CPP-Open-Math-Library/stargazers">
     <img src="https://img.shields.io/github/stars/Presence-Collaboratory/AfterMath-CPP-Open-Math-Library?style=social" alt="Stars">
