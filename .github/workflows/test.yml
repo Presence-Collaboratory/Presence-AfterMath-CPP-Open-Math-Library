@@ -1,0 +1,30 @@
+name: Tests
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+
+jobs:
+  test:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+        platform: [x64, Win32]
+    runs-on: windows-latest
+
+    steps:
+      - name: Download test executable
+        uses: actions/download-artifact@v4
+        with:
+          name: AfterMathTests-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: ${{ runner.temp }}\tests
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run tests
+        working-directory: ${{ runner.temp }}\tests
+        run: .\AfterMathTests.exe
