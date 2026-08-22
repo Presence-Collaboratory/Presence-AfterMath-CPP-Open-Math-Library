@@ -60,6 +60,8 @@
 #include "math_quaternion.h"
 #include "math_rect.h"
 
+#include "math_ray.h"
+
 // ============================================================================
 // Cross type operations and conversions
 // ============================================================================
@@ -134,56 +136,4 @@ using fRect = AfterMath::TemplateRect<float>;
 using iRect = AfterMath::TemplateRect<float>;
 using Rect = AfterMath::TemplateRect<uint>;
 
-// ============================================================================
-// Common Global Constants
-// ============================================================================
-
-// Half-precision constants
-extern const AfterMath::half half_Zero;
-extern const AfterMath::half half_One;
-extern const AfterMath::half half_Max;
-extern const AfterMath::half half_Min;
-extern const AfterMath::half half_Epsilon;
-extern const AfterMath::half half_PI;
-extern const AfterMath::half half_TwoPI;
-extern const AfterMath::half half_HalfPI;
-extern const AfterMath::half half_QuarterPI;
-extern const AfterMath::half half_InvPI;
-extern const AfterMath::half half_InvTwoPI;
-extern const AfterMath::half half_DegToRad;
-extern const AfterMath::half half_RadToDeg;
-extern const AfterMath::half half_Sqrt2;
-extern const AfterMath::half half_E;
-extern const AfterMath::half half_GoldenRatio;
-
-// 2D vector constants
-extern const AfterMath::float2 float2_Zero;
-extern const AfterMath::float2 float2_One;
-extern const AfterMath::float2 float2_UnitX;
-extern const AfterMath::float2 float2_UnitY;
-extern const AfterMath::float2 float2_Right;
-extern const AfterMath::float2 float2_Left;
-extern const AfterMath::float2 float2_Up;
-extern const AfterMath::float2 float2_Down;
-
-// 3D vector constants
-extern const AfterMath::float3 float3_Zero;
-extern const AfterMath::float3 float3_One;
-extern const AfterMath::float3 float3_UnitX;
-extern const AfterMath::float3 float3_UnitY;
-extern const AfterMath::float3 float3_UnitZ;
-extern const AfterMath::float3 float3_Forward;
-extern const AfterMath::float3 float3_Up;
-extern const AfterMath::float3 float3_Right;
-
-// 4D vector constants
-extern const AfterMath::float4 float4_Zero;
-extern const AfterMath::float4 float4_One;
-
-// Matrix constants
-extern const AfterMath::float2x2 float2x2_Identity;
-extern const AfterMath::float2x2 float2x2_Zero;
-extern const AfterMath::float3x3 float3x3_Identity;
-extern const AfterMath::float3x3 float3x3_Zero;
-extern const AfterMath::float4x4 float4x4_Identity;
-extern const AfterMath::float4x4 float4x4_Zero;
+using ray = AfterMath::ray;
