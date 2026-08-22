@@ -12,10 +12,10 @@
 #include "autotests_half4.h"
 
 #include "autotests_quaternion.h"
-
 #include "autotests_rect.h"
 
 #include "autotests_ray.h"
+#include "autotests_aabb.h"
 
 int main()
 {
@@ -44,6 +44,7 @@ int main()
     RUN_TEST_SUITE("quaternion", verbose, AfterMathTests::RunQuaternionTests);
     RUN_TEST_SUITE("Rect", verbose, AfterMathTests::RunRectTests);
     RUN_TEST_SUITE("Ray", verbose, AfterMathTests::RunRayTests);
+    RUN_TEST_SUITE("AABB", verbose, AfterMathTests::RunAABBTests);
 
     return all_passed ? 0 : 1;
 }
