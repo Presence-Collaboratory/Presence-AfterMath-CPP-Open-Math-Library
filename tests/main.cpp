@@ -15,6 +15,8 @@
 
 #include "autotests_rect.h"
 
+#include "autotests_ray.h"
+
 int main()
 {
     bool all_passed = true;
@@ -41,6 +43,7 @@ int main()
     RUN_TEST_SUITE("half4", verbose, AfterMathTests::RunHalf4Tests);
     RUN_TEST_SUITE("quaternion", verbose, AfterMathTests::RunQuaternionTests);
     RUN_TEST_SUITE("Rect", verbose, AfterMathTests::RunRectTests);
+    RUN_TEST_SUITE("Ray", verbose, AfterMathTests::RunRayTests);
 
     return all_passed ? 0 : 1;
 }
